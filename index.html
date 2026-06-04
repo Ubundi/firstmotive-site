@@ -340,6 +340,126 @@
     line-height: 1.45;
   }
 
+  /* ———— WORKSPACE / COMMUNITY ———— */
+  .cowork {
+    background: var(--bg);
+    color: var(--fg);
+    padding: 120px 48px;
+    position: relative;
+    border-top: 1px solid var(--rule);
+  }
+  .cowork-inner { max-width: 1100px; margin: 0 auto; }
+
+  .cw-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .cw-eyebrow::before {
+    content: "";
+    width: 32px; height: 1px;
+    background: var(--fg-faint);
+    display: inline-block;
+  }
+  .cw-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--plum);
+    background: var(--accent);
+    padding: 3px 7px;
+    border-radius: 2px;
+  }
+
+  .cowork h2 {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: clamp(32px, 5vw, 64px);
+    line-height: 1.04;
+    letter-spacing: -0.032em;
+    max-width: 15ch;
+  }
+  .cowork h2 em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 300;
+    color: var(--accent);
+  }
+  .cw-lead {
+    margin-top: 32px;
+    font-size: clamp(17px, 1.5vw, 21px);
+    line-height: 1.5;
+    color: var(--fg-dim);
+    max-width: 54ch;
+  }
+
+  .cw-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    margin-top: 76px;
+    border-top: 1px solid var(--rule);
+    padding-top: 48px;
+  }
+  .cw-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--fg-dim);
+    margin-bottom: 16px;
+  }
+  .cw-room-line {
+    font-size: 18px;
+    line-height: 1.4;
+    color: var(--fg);
+    max-width: 28ch;
+  }
+  .cw-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+  }
+  .cw-chip {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.03em;
+    color: var(--fg-dim);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 7px 12px;
+  }
+  .cw-invite {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--fg-dim);
+  }
+  .cw-invite strong { color: var(--fg); font-weight: 500; }
+  .cw-note {
+    margin-top: 24px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--fg-dim);
+  }
+  .cw-cta { margin-top: 28px; }
+
+  .cowork .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.8s cubic-bezier(0.2,0.7,0.2,1), transform 0.8s cubic-bezier(0.2,0.7,0.2,1);
+  }
+  .cowork .reveal.is-visible { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    .cowork .reveal { opacity: 1; transform: none; transition: none; }
+  }
+
   /* ———— FOOTER ———— */
   footer {
     background: var(--bg-deep);
@@ -437,6 +557,8 @@
     .corner-mark { right: 24px; bottom: 20px; }
     .nav-right .nav-hide { display: none; }
     .hero { padding: 48px 0 40px; }
+    .cowork { padding: 80px 24px; }
+    .cw-cols { grid-template-columns: 1fr; gap: 44px; margin-top: 56px; padding-top: 40px; }
   }
 </style>
 </head>
@@ -451,6 +573,7 @@
       </svg>
     </a>
     <div class="nav-right">
+      <a href="#work" class="nav-hide">Work here</a>
       <a href="mailto:adii@firstmotive.ai">Contact</a>
     </div>
   </nav>
@@ -499,6 +622,51 @@
   </div>
 </section>
 
+<section class="cowork" id="work">
+  <div class="cowork-inner">
+    <div class="cw-eyebrow reveal"><span class="cw-tag">New</span> A place to work · Stellenbosch</div>
+    <h2 class="reveal">Pull up a chair and come work <em>next to us.</em></h2>
+    <p class="cw-lead reveal">
+      Curated, accessible, and with a peek behind the scenes where we build the data engine for physical
+      intelligence — a small workspace in Stellenbosch, opening 2026.
+    </p>
+
+    <div class="cw-cols">
+      <div class="reveal">
+        <div class="cw-label">Who's in the room</div>
+        <p class="cw-room-line">People building or adjacent to South Africa's global place in AI.</p>
+        <div class="cw-chips">
+          <span class="cw-chip">AI &amp; ML</span>
+          <span class="cw-chip">Creative &amp; design</span>
+          <span class="cw-chip">Tech &amp; engineering</span>
+          <span class="cw-chip">Research</span>
+          <span class="cw-chip">the genuinely curious</span>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="cw-label">How you get in</div>
+        <p class="cw-invite">
+          Open to everyone — students, founders, freelancers; all ages, all budgets. The
+          <strong>one thing we look for</strong> is that you're genuinely into this AI world. Request an invite,
+          tell us what you're into, and you're in.
+        </p>
+        <p class="cw-note">
+          It's not open yet — we're shaping it now. Tell us what you'd want from a space like this, and get
+          first dibs on a founding spot.
+        </p>
+        <div class="cw-cta">
+          <a class="btn" href="https://YOUR-TYPEFORM-URL-HERE" target="_blank" rel="noopener">
+            Help shape it
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer>
   <div class="footer-inner">
     <h3>
@@ -519,6 +687,26 @@
     <span>From the team behind WooCommerce, applying open-infrastructure thinking to the data layer of Physical AI.</span>
   </div>
 </footer>
+
+<script>
+  (function () {
+    var els = document.querySelectorAll('.cowork .reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+    els.forEach(function (el, i) { el.style.transitionDelay = (i * 90) + 'ms'; });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    els.forEach(function (el) { io.observe(el); });
+  })();
+</script>
 
 </body>
 </html>
