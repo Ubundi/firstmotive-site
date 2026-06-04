@@ -448,7 +448,10 @@
     line-height: 1.5;
     color: var(--fg-dim);
   }
-  .cw-cta { margin-top: 28px; }
+  .cw-typeform {
+    margin-top: 32px;
+    min-height: 400px;
+  }
 
   .cowork .reveal {
     opacity: 0;
@@ -654,13 +657,8 @@
           It's not open yet — we're shaping it now. Tell us what you'd want from a space like this, and get
           first dibs on a founding spot.
         </p>
-        <div class="cw-cta">
-          <a class="btn" href="https://YOUR-TYPEFORM-URL-HERE" target="_blank" rel="noopener">
-            Help shape it
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
-            </svg>
-          </a>
+        <div class="cw-typeform">
+          <div data-tf-live="01KT8WQTVQX2HBCMZ4RR7Y93W1"></div>
         </div>
       </div>
     </div>
@@ -688,6 +686,7 @@
   </div>
 </footer>
 
+<script src="https://embed.typeform.com/next/embed.js"></script>
 <script>
   (function () {
     var els = document.querySelectorAll('.cowork .reveal');
