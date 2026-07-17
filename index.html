@@ -701,14 +701,20 @@
     min-height: 400px;
   }
 
-  .cowork .reveal {
+  /* ———— SECTION REVEAL (cascaded fade-in) ———— */
+  .reveal {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.8s cubic-bezier(0.2,0.7,0.2,1), transform 0.8s cubic-bezier(0.2,0.7,0.2,1);
   }
-  .cowork .reveal.is-visible { opacity: 1; transform: none; }
+  .reveal.is-visible { opacity: 1; transform: none; }
+  .reveal-fade {
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(0.2,0.7,0.2,1);
+  }
+  .reveal-fade.is-visible { opacity: 1; }
   @media (prefers-reduced-motion: reduce) {
-    .cowork .reveal { opacity: 1; transform: none; transition: none; }
+    .reveal, .reveal-fade { opacity: 1; transform: none; transition: none; }
   }
 
   /* ———— FOOTER ———— */
@@ -937,18 +943,18 @@
 </section>
 
 <section class="statement" id="what-we-do">
-  <div class="statement-visuals" aria-hidden="true">
+  <div class="statement-visuals reveal-fade" aria-hidden="true">
     <div class="robot-arms">
       <img class="robot-leader" src="assets/leader-arms.png?v=2" alt="">
       <img class="robot-follower" src="assets/follower-arms.png?v=2" alt="">
     </div>
   </div>
   <div class="statement-inner">
-    <div class="label">What we do</div>
-    <h2>
+    <div class="label reveal">What we do</div>
+    <h2 class="reveal">
       Every AI breakthrough has been a data story. <em>Physical AI has no data.</em>
     </h2>
-    <p class="statement-follow">
+    <p class="statement-follow reveal">
       Robots learn from recordings of real tasks — every reach, grip, and slip. That data doesn't exist yet, so we're creating it by capturing real-world tasks and structuring it into reusable training data.
     </p>
   </div>
@@ -956,28 +962,28 @@
 
 <section class="how" id="how-we-work">
   <div class="how-inner">
-    <div class="how-visual">
+    <div class="how-visual reveal-fade">
       <img src="assets/humanoid.png?v=2" alt="Humanoid robot on a mobile base">
     </div>
     <div class="how-copy">
-      <div class="how-label">How we work</div>
-      <h2>From real-world tasks to <em>training-ready data.</em></h2>
-      <p class="how-lead">
+      <div class="how-label reveal">How we work</div>
+      <h2 class="reveal">From real-world tasks to <em>training-ready data.</em></h2>
+      <p class="how-lead reveal">
         We capture how physical tasks are executed in the real world through our own vision, depth, force, and touch sensor devices — then we structure and package it into clean, standardised datasets, delivered ready to train on.
       </p>
-      <p class="how-stages">One engine, three stages.</p>
+      <p class="how-stages reveal">One engine, three stages.</p>
       <div class="how-flow">
-        <div class="how-step">
+        <div class="how-step reveal">
           <img src="assets/capture.png" alt="">
           <span>Capture</span>
         </div>
-        <span class="how-arrow" aria-hidden="true">→</span>
-        <div class="how-step">
+        <span class="how-arrow reveal" aria-hidden="true">→</span>
+        <div class="how-step reveal">
           <img src="assets/structure.png" alt="">
           <span>Structure</span>
         </div>
-        <span class="how-arrow" aria-hidden="true">→</span>
-        <div class="how-step">
+        <span class="how-arrow reveal" aria-hidden="true">→</span>
+        <div class="how-step reveal">
           <img src="assets/deliver.png" alt="">
           <span>Deliver</span>
         </div>
@@ -1028,20 +1034,20 @@
 
 <footer>
   <div class="footer-inner">
-    <h3>
+    <h3 class="reveal">
       Building the <em>data engine</em> for physical intelligence.
     </h3>
-    <div class="foot-col">
+    <div class="foot-col reveal">
       <span class="foot-label">Contact</span>
       <a href="mailto:adii@firstmotive.ai">adii@firstmotive.ai</a>
       <a href="https://firstmotive.ai">firstmotive.ai</a>
     </div>
-    <div class="foot-col">
+    <div class="foot-col reveal">
       <span class="foot-label">Operations</span>
       <span>Stellenbosch · ZA</span>
     </div>
   </div>
-  <div class="foot-bottom">
+  <div class="foot-bottom reveal">
     <span>© 2026 First Motive</span>
     <span>From the team behind WooCommerce, applying open-infrastructure thinking to the data layer of Physical AI.</span>
   </div>
@@ -1050,12 +1056,25 @@
 <script src="https://embed.typeform.com/next/embed.js"></script>
 <script>
   (function () {
-    var els = document.querySelectorAll('.cowork .reveal');
+    var els = document.querySelectorAll('.reveal, .reveal-fade');
+    if (!els.length) return;
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      els.forEach(function (el) { el.classList.add('is-visible'); });
+      return;
+    }
+
     if (!('IntersectionObserver' in window)) {
       els.forEach(function (el) { el.classList.add('is-visible'); });
       return;
     }
-    els.forEach(function (el, i) { el.style.transitionDelay = (i * 90) + 'ms'; });
+
+    document.querySelectorAll('section, footer').forEach(function (section) {
+      section.querySelectorAll('.reveal, .reveal-fade').forEach(function (el, i) {
+        el.style.transitionDelay = (i * 90) + 'ms';
+      });
+    });
+
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -1063,7 +1082,8 @@
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+
     els.forEach(function (el) { io.observe(el); });
   })();
 </script>
