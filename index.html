@@ -38,6 +38,7 @@
     --rule: rgba(236, 226, 207, 0.14);
     --accent: #B6A5C6;
     --plum: #3B3443;
+    --good: #B6E0B0;
 
     --font-sans: "Geist", -apple-system, BlinkMacSystemFont, sans-serif;
     --font-serif: "Fraunces", Georgia, serif;
@@ -587,11 +588,298 @@
     line-height: 1;
   }
 
+  /* ———— UNDER THE HOOD ———— */
+  .hood {
+    background: var(--bg-cream);
+    color: var(--plum);
+    padding: 100px 48px;
+    position: relative;
+    z-index: 1;
+  }
+  .hood-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 520px);
+    gap: clamp(40px, 6vw, 72px);
+    align-items: center;
+  }
+  .hood-copy {
+    max-width: 560px;
+  }
+  .hood-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(59, 52, 67, 0.78);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .hood-label::before {
+    content: "";
+    width: 32px;
+    height: 1px;
+    background: rgba(59, 52, 67, 0.3);
+  }
+  .hood h2 {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: clamp(28px, 3.8vw, 48px);
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    max-width: 16ch;
+  }
+  .hood h2 em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 300;
+    color: rgba(59, 52, 67, 0.7);
+  }
+  .hood-lead {
+    margin-top: 28px;
+    font-size: clamp(16px, 1.4vw, 19px);
+    line-height: 1.55;
+    color: rgba(59, 52, 67, 0.78);
+    max-width: 52ch;
+  }
+  .hood-kicker {
+    margin-top: 28px;
+    font-size: clamp(16px, 1.4vw, 19px);
+    line-height: 1.45;
+    font-weight: 500;
+    color: var(--plum);
+  }
+  .hood-cta {
+    margin-top: 36px;
+  }
+  .hood .btn {
+    background: var(--plum);
+    color: var(--bg-cream);
+  }
+  .hood .btn:hover {
+    background: #2a2530;
+    color: var(--bg-cream);
+  }
+
+  /* —— live-capture panel —— */
+  .cap {
+    position: relative;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background:
+      radial-gradient(120% 100% at 0% 0%, rgba(182,165,198,0.10), transparent 55%),
+      var(--bg-deep);
+    padding: 16px;
+    box-shadow: 0 24px 60px -30px rgba(0,0,0,0.6);
+    overflow: hidden;
+    color: var(--fg);
+  }
+  .cap::after {
+    content: "";
+    position: absolute; inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(236,226,207,0.03), transparent 30%);
+  }
+  .cap-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+  }
+  .cap-live { display: flex; align-items: center; gap: 8px; }
+  .cap-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 rgba(182,165,198,0.6);
+    animation: capPulse 2s ease-in-out infinite;
+  }
+  @keyframes capPulse {
+    0%,100% { opacity: 1; box-shadow: 0 0 0 0 rgba(182,165,198,0.45); }
+    50%     { opacity: 0.55; box-shadow: 0 0 0 5px rgba(182,165,198,0); }
+  }
+  .cap-timer { color: var(--fg); font-variant-numeric: tabular-nums; }
+  .cap-vision {
+    position: relative;
+    height: 190px;
+    border-radius: 4px;
+    overflow: hidden;
+    background:
+      radial-gradient(90% 120% at 70% 20%, rgba(182,165,198,0.14), transparent 60%),
+      linear-gradient(160deg, #2b2632, #211d27);
+    border: 1px solid rgba(236,226,207,0.06);
+  }
+  .cap-vision::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: radial-gradient(rgba(236,226,207,0.10) 1px, transparent 1.4px);
+    background-size: 22px 22px;
+    opacity: 0.5;
+  }
+  .cap-scan {
+    position: absolute; left: 0; right: 0; height: 40%;
+    background: linear-gradient(180deg, transparent, rgba(182,165,198,0.16), transparent);
+    animation: capScan 4.5s linear infinite;
+  }
+  @keyframes capScan {
+    0%   { transform: translateY(-45%); }
+    100% { transform: translateY(240%); }
+  }
+  .cap-reticle {
+    position: absolute; top: 50%; left: 50%;
+    width: 96px; height: 72px;
+    margin: -36px 0 0 -48px;
+    animation: capDrift 9s ease-in-out infinite alternate;
+  }
+  .cap-reticle span {
+    position: absolute; width: 14px; height: 14px;
+    border: 1.5px solid var(--accent);
+  }
+  .cap-reticle span:nth-child(1){ top:0;left:0;border-right:none;border-bottom:none; }
+  .cap-reticle span:nth-child(2){ top:0;right:0;border-left:none;border-bottom:none; }
+  .cap-reticle span:nth-child(3){ bottom:0;left:0;border-right:none;border-top:none; }
+  .cap-reticle span:nth-child(4){ bottom:0;right:0;border-left:none;border-top:none; }
+  .cap-reticle::before, .cap-reticle::after {
+    content:""; position:absolute; top:50%; left:50%; background:var(--accent); opacity:0.7;
+  }
+  .cap-reticle::before { width:11px; height:1px; margin:-0.5px 0 0 -5.5px; }
+  .cap-reticle::after  { width:1px; height:11px; margin:-5.5px 0 0 -0.5px; }
+  @keyframes capDrift {
+    0%   { transform: translate(-10px,-6px); }
+    50%  { transform: translate(12px,4px); }
+    100% { transform: translate(-4px,8px); }
+  }
+  .cap-tag {
+    position: absolute; top: 10px; left: 12px;
+    font-family: var(--font-mono);
+    font-size: 9px; letter-spacing: 0.16em;
+    color: var(--fg-dim);
+  }
+  .cap-tc {
+    position: absolute; bottom: 10px; right: 12px;
+    font-family: var(--font-mono);
+    font-size: 9px; letter-spacing: 0.08em;
+    color: var(--fg-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .cap-views {
+    display: grid;
+    grid-template-columns: 1.7fr 1fr;
+    gap: 12px;
+  }
+  .cap-depth {
+    position: relative;
+    height: 190px;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid rgba(236,226,207,0.06);
+    background: #0f0d12;
+  }
+  .cap-depth canvas { display: block; width: 100%; height: 100%; }
+  .cap-depth .cap-tag {
+    top: 8px; left: 8px;
+    color: var(--fg);
+    background: rgba(15,13,18,0.62);
+    padding: 3px 6px;
+    border-radius: 2px;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  .cap-signal {
+    position: relative;
+    margin-top: 12px;
+    height: 76px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(236,226,207,0.06);
+    overflow: hidden;
+  }
+  .cap-signal canvas { display: block; width: 100%; height: 100%; }
+  .cap-signal .cap-tag { top: 8px; left: 10px; }
+  .cap-legend {
+    position: absolute; bottom: 7px; left: 10px;
+    display: flex; gap: 14px;
+    font-family: var(--font-mono); font-size: 9px;
+    letter-spacing: 0.08em; color: var(--fg-faint);
+  }
+  .cap-legend i { display:inline-block; width:8px; height:2px; margin-right:5px; vertical-align:middle; }
+  .cap-quality {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .cap-chip {
+    position: relative;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    padding: 9px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--fg-dim);
+    cursor: default;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .cap-chip:hover { border-color: var(--fg-dim); background: rgba(236,226,207,0.05); }
+  .cap-chip b { color: var(--fg); font-weight: 500; }
+  .cap-chip::after {
+    content: attr(data-status);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--fg);
+    color: var(--plum);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    padding: 4px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .cap-chip::before {
+    content: "";
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: var(--fg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+  }
+  .cap-chip:hover::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .cap-chip:hover::before { opacity: 1; }
+  .cap-gdot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--good);
+    flex: none;
+    animation: capGood 2.6s ease-in-out infinite;
+  }
+  .cap-chip:nth-child(2) .cap-gdot { animation-delay: 0.4s; }
+  .cap-chip:nth-child(3) .cap-gdot { animation-delay: 0.8s; }
+  .cap-chip:nth-child(4) .cap-gdot { animation-delay: 1.2s; }
+  @keyframes capGood { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
   /* ———— WORKSPACE / COMMUNITY ———— */
   .cowork {
     background: var(--bg);
     color: var(--fg);
-    padding: 120px 48px;
+    padding: 120px 48px 64px;
     position: relative;
     z-index: 1;
     border-top: 1px solid var(--rule);
@@ -650,10 +938,11 @@
   .cw-cols {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 64px;
-    margin-top: 76px;
+    gap: 48px;
+    margin-top: 48px;
     border-top: 1px solid var(--rule);
-    padding-top: 48px;
+    padding-top: 36px;
+    align-items: start;
   }
   .cw-label {
     font-family: var(--font-mono);
@@ -697,8 +986,11 @@
     color: var(--fg-dim);
   }
   .cw-typeform {
-    margin-top: 32px;
-    min-height: 400px;
+    margin-top: 20px;
+  }
+  .cw-typeform iframe {
+    min-height: 0 !important;
+    height: 240px !important;
   }
 
   /* ———— SECTION REVEAL (cascaded fade-in) ———— */
@@ -715,6 +1007,8 @@
   .reveal-fade.is-visible { opacity: 1; }
   @media (prefers-reduced-motion: reduce) {
     .reveal, .reveal-fade { opacity: 1; transform: none; transition: none; }
+    .cap-dot, .cap-scan, .cap-reticle, .cap-gdot { animation: none !important; }
+    .cap-dot { box-shadow: none; }
   }
 
   /* ———— FOOTER ———— */
@@ -822,6 +1116,10 @@
       width: 100%;
       max-width: 720px;
     }
+    .hood-inner {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
   }
   @media (max-width: 820px) {
     .page { padding: 20px 24px; }
@@ -840,6 +1138,13 @@
       max-width: 220px;
     }
     .how h2 { max-width: none; }
+    .hood { padding: 72px 24px; }
+    .hood-inner {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .hood h2 { max-width: none; }
+    .cap-quality { grid-template-columns: repeat(2, 1fr); }
     footer { padding: 64px 24px 24px; }
     .meta-strip { grid-template-columns: repeat(2, 1fr); gap: 20px; }
     .numbers { grid-template-columns: 1fr; gap: 28px; }
@@ -849,8 +1154,12 @@
     .nav-right .nav-hide { display: none; }
     .hero { padding: 48px 0 40px; grid-template-columns: 1fr; }
     .orbit-wrapper { display: none; }
-    .cowork { padding: 80px 24px; }
-    .cw-cols { grid-template-columns: 1fr; gap: 44px; margin-top: 56px; padding-top: 40px; }
+    .cowork { padding: 80px 24px 48px; }
+    .cw-cols { grid-template-columns: 1fr; gap: 40px; margin-top: 40px; padding-top: 32px; }
+  }
+  @media (max-width: 440px) {
+    .cap-views { grid-template-columns: 1fr; }
+    .cap-depth { height: 140px; }
   }
 </style>
 </head>
@@ -992,6 +1301,63 @@
   </div>
 </section>
 
+<section class="hood" id="under-the-hood">
+  <div class="hood-inner">
+    <div class="hood-copy">
+      <div class="hood-label reveal">Under the hood · Coming soon</div>
+      <h2 class="reveal">Check out the tool <em>behind our data.</em></h2>
+      <p class="hood-lead reveal">
+        The ground truth doesn't collect itself. We built the tool to capture it: an open-source macOS app our operators use to set up robots and record episodes in the field. Good data starts with the way it's captured.
+      </p>
+      <p class="hood-kicker reveal">Built in-house. Open to all.</p>
+      <div class="hood-cta reveal">
+        <a class="btn" href="mailto:adii@firstmotive.ai?subject=Request%20early%20access">
+          Request early access
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="square"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="cap reveal-fade" aria-hidden="true">
+      <div class="cap-head">
+        <span>Capture session</span>
+        <span class="cap-live"><span class="cap-dot"></span> Live · <span class="cap-timer" id="capTimer">00:00</span></span>
+      </div>
+
+      <div class="cap-views">
+        <div class="cap-vision">
+          <div class="cap-scan"></div>
+          <div class="cap-reticle"><span></span><span></span><span></span><span></span></div>
+          <div class="cap-tag">VISION</div>
+          <div class="cap-tc" id="capTc">REC ● 00:00</div>
+        </div>
+        <div class="cap-depth">
+          <canvas id="capDepthCanvas"></canvas>
+          <div class="cap-tag">DEPTH</div>
+        </div>
+      </div>
+
+      <div class="cap-signal">
+        <canvas id="capCanvas"></canvas>
+        <div class="cap-tag">MOTION / FORCE</div>
+        <div class="cap-legend">
+          <span><i style="background:var(--accent)"></i>motion</span>
+          <span><i style="background:rgba(236,226,207,0.55)"></i>force</span>
+        </div>
+      </div>
+
+      <div class="cap-quality">
+        <div class="cap-chip" data-status="Good"><span class="cap-gdot"></span><b>Vision</b></div>
+        <div class="cap-chip" data-status="Good"><span class="cap-gdot"></span><b>Depth</b></div>
+        <div class="cap-chip" data-status="Good"><span class="cap-gdot"></span><b>Force</b></div>
+        <div class="cap-chip" data-status="Good"><span class="cap-gdot"></span><b>Tactile</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="cowork" id="work">
   <div class="cowork-inner">
     <div class="cw-eyebrow reveal"><span class="cw-tag">New</span> A place to work · Stellenbosch</div>
@@ -1086,6 +1452,162 @@
 
     els.forEach(function (el) { io.observe(el); });
   })();
+</script>
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var t0 = Date.now();
+  var elTimer = document.getElementById('capTimer');
+  var elTc = document.getElementById('capTc');
+  function fmt(s){ var m=Math.floor(s/60), r=s%60; return (m<10?'0':'')+m+':'+(r<10?'0':'')+r; }
+  function tick(){
+    var s = Math.floor((Date.now()-t0)/1000);
+    if (elTimer) elTimer.textContent = fmt(s);
+    if (elTc) elTc.textContent = 'REC \u25CF ' + fmt(s);
+  }
+  tick();
+  if (!reduce) setInterval(tick, 1000);
+
+  var canvas = document.getElementById('capCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = 0, H = 0;
+
+  function resize() {
+    var r = canvas.getBoundingClientRect();
+    W = Math.max(1, Math.floor(r.width));
+    H = Math.max(1, Math.floor(r.height));
+    canvas.width = W * dpr;
+    canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  var accent = 'rgba(182,165,198,0.95)';
+  var cream  = 'rgba(236,226,207,0.5)';
+
+  function chan(x, t, base, k, sp, amps) {
+    var y = 0;
+    y += amps[0]*Math.sin(x*k        + t*sp);
+    y += amps[1]*Math.sin(x*k*2.3    - t*sp*1.4 + 1.1);
+    y += amps[2]*Math.sin(x*k*0.5    + t*sp*0.6 + 2.2);
+    return base + y;
+  }
+
+  function drawChannel(t, base, k, sp, amps, color) {
+    ctx.beginPath();
+    for (var x = 0; x <= W; x += 2) {
+      var y = chan(x, t, base, k, sp, amps);
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.4;
+    ctx.stroke();
+  }
+
+  function frame(t) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(236,226,207,0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, H*0.5); ctx.lineTo(W, H*0.5); ctx.stroke();
+    drawChannel(t, H*0.40, 0.045, 0.9, [5, 2, 4], cream);
+    drawChannel(t, H*0.64, 0.075, 1.7, [7, 4, 2], accent);
+  }
+
+  if (reduce) {
+    frame(0);
+  } else {
+    var start = performance.now();
+    (function loop(now){
+      frame((now - start) / 1000);
+      requestAnimationFrame(loop);
+    })(start);
+  }
+
+  var dCanvas = document.getElementById('capDepthCanvas');
+  if (dCanvas) {
+    var dctx = dCanvas.getContext('2d');
+    var dW = 0, dH = 0;
+    function dResize() {
+      var r = dCanvas.getBoundingClientRect();
+      dW = Math.max(1, Math.floor(r.width));
+      dH = Math.max(1, Math.floor(r.height));
+      dCanvas.width = dW * dpr;
+      dCanvas.height = dH * dpr;
+      dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    dResize();
+    window.addEventListener('resize', dResize);
+
+    var RAMP = [
+      [0.00, [ 62,  80, 150]],
+      [0.28, [ 68, 168, 190]],
+      [0.52, [122, 198, 132]],
+      [0.76, [226, 206, 120]],
+      [1.00, [216, 150, 118]]
+    ];
+    function ramp(t) {
+      t = t < 0 ? 0 : t > 1 ? 1 : t;
+      for (var i = 1; i < RAMP.length; i++) {
+        if (t <= RAMP[i][0]) {
+          var a = RAMP[i-1], b = RAMP[i];
+          var f = (t - a[0]) / (b[0] - a[0]);
+          return [
+            Math.round(a[1][0] + (b[1][0]-a[1][0])*f),
+            Math.round(a[1][1] + (b[1][1]-a[1][1])*f),
+            Math.round(a[1][2] + (b[1][2]-a[1][2])*f)
+          ];
+        }
+      }
+      return RAMP[RAMP.length-1][1];
+    }
+
+    function depthAt(nx, ny, t) {
+      var d = 0.30 + ny * 0.45;
+      d += 0.30 * blob(nx, ny, 0.32 + 0.05*Math.sin(t*0.3), 0.40, 0.22);
+      d += 0.42 * blob(nx, ny, 0.70 + 0.04*Math.cos(t*0.24), 0.30, 0.26);
+      d -= 0.22 * blob(nx, ny, 0.52, 0.66 + 0.03*Math.sin(t*0.4), 0.18);
+      return d;
+    }
+    function blob(x, y, cx, cy, r) {
+      var dx = (x-cx)/r, dy = (y-cy)/r;
+      return Math.exp(-(dx*dx + dy*dy));
+    }
+
+    var STEP = 2.2;
+    var DOT = 1.1;
+    function dFrame(t) {
+      dctx.clearRect(0, 0, dW, dH);
+      for (var y = 1.5; y < dH; y += STEP) {
+        for (var x = 1.5; x < dW; x += STEP) {
+          if (Math.random() < 0.07) continue;
+          var jx = (Math.random()-0.5) * 0.8;
+          var jy = (Math.random()-0.5) * 0.8;
+          var nx = x / dW, ny = y / dH;
+          var d = depthAt(nx, ny, t);
+          d = d < 0 ? 0 : d > 1 ? 1 : d;
+          var c = ramp(d);
+          dctx.fillStyle = 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',0.92)';
+          dctx.fillRect(x + jx, y + jy, DOT, DOT);
+        }
+      }
+    }
+
+    if (reduce) {
+      dFrame(0);
+    } else {
+      var dStart = performance.now();
+      var last = 0;
+      (function dLoop(now){
+        if (now - last > 50) { dFrame((now - dStart)/1000); last = now; }
+        requestAnimationFrame(dLoop);
+      })(dStart);
+    }
+  }
+})();
 </script>
 
 </body>
