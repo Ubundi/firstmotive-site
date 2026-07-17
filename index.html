@@ -131,14 +131,105 @@
   .hero {
     flex: 1;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr auto;
     align-items: center;
+    gap: 40px;
     padding: 80px 0 60px;
     position: relative;
   }
 
   .hero-inner {
-    max-width: 1100px;
+    max-width: 700px;
+  }
+
+  /* ———— ORBIT ———— */
+  .orbit-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 200px;
+  }
+  .orbit-container {
+    position: relative;
+    width: 420px;
+    height: 420px;
+    background: radial-gradient(circle at 50% 50%, rgba(182, 165, 198, 0.12) 0%, rgba(182, 165, 198, 0.04) 40%, transparent 70%);
+  }
+  .orbit-ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 280px;
+    border: 5px solid #E6DEC8;
+    border-radius: 50%;
+  }
+  .orbit-center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 13px;
+    color: #908887;
+    line-height: 1.55;
+    white-space: nowrap;
+  }
+  .orbit-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    animation: orbit-spin 100s linear infinite;
+  }
+  .orbit-icon {
+    position: absolute;
+    left: 140px;
+    top: 0;
+    width: 52px;
+    height: 52px;
+    background: #3C3544;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    animation: orbit-counter-spin 100s linear infinite;
+    overflow: hidden;
+  }
+  .orbit-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  .orbit-label {
+    position: absolute;
+    left: 186px;
+    top: 0;
+    transform: translate(-50%, -50%);
+    animation: orbit-counter-spin 100s linear infinite;
+    font-family: var(--font-sans);
+    font-weight: 500;
+    font-size: 11px;
+    color: #b7a6c6;
+    background: rgba(167, 125, 179, 0.15);
+    border: 1px solid rgba(167, 125, 179, 0.35);
+    border-radius: 100px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+
+  @keyframes orbit-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes orbit-counter-spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(-360deg); }
   }
 
   .eyebrow {
@@ -566,7 +657,8 @@
     .foot-bottom { flex-direction: column; gap: 8px; }
     .corner-mark { right: 24px; bottom: 20px; }
     .nav-right .nav-hide { display: none; }
-    .hero { padding: 48px 0 40px; }
+    .hero { padding: 48px 0 40px; grid-template-columns: 1fr; }
+    .orbit-wrapper { display: none; }
     .cowork { padding: 80px 24px; }
     .cw-cols { grid-template-columns: 1fr; gap: 44px; margin-top: 56px; padding-top: 40px; }
   }
@@ -615,6 +707,43 @@
         <div>
           <span class="meta-label">Based</span>
           <span class="meta-value">Stellenbosch, ZA</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="orbit-wrapper">
+      <div class="orbit-container">
+        <div class="orbit-ring"></div>
+        <div class="orbit-center-text">
+          Multi-modal,<br>RLDS compatible<br>data capturing
+        </div>
+
+        <div class="orbit-item" style="animation-delay: -75s">
+          <div class="orbit-icon" style="animation-delay: -75s">
+            <img src="assets/vision.png" alt="Vision — camera with sparkle">
+          </div>
+          <div class="orbit-label" style="animation-delay: -75s">Vision</div>
+        </div>
+
+        <div class="orbit-item" style="animation-delay: 0s">
+          <div class="orbit-icon" style="animation-delay: 0s">
+            <img src="assets/depth.png" alt="Depth — ellipse with sparkle">
+          </div>
+          <div class="orbit-label" style="animation-delay: 0s">Depth</div>
+        </div>
+
+        <div class="orbit-item" style="animation-delay: -25s">
+          <div class="orbit-icon" style="animation-delay: -25s">
+            <img src="assets/force.png" alt="Force — arc with lightning bolt">
+          </div>
+          <div class="orbit-label" style="animation-delay: -25s">Force</div>
+        </div>
+
+        <div class="orbit-item" style="animation-delay: -50s">
+          <div class="orbit-icon" style="animation-delay: -50s">
+            <img src="assets/tactile.png" alt="Tactile — waving hand">
+          </div>
+          <div class="orbit-label" style="animation-delay: -50s">Tactile</div>
         </div>
       </div>
     </div>
