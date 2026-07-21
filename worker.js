@@ -47,7 +47,6 @@ export default {
       headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
 
       return new Response(assetResponse.body, {
-        status: assetResponse.status,
         headers,
       });
     }
