@@ -41,14 +41,16 @@ export default {
         });
       }
 
-      const assetResponse = await env.ASSETS.fetch(request);
-      const headers = new Headers(assetResponse.headers);
-      headers.set('Cache-Control', 'private, no-store');
-      headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+      // Static Assets treats Authorization specially. Authentication has already
+      // been checked above, so remove it before delegating to the asset service.
+      const assetRequest = new Request(request);
+      assetRequest.headers.delete('Authorization');
+      const assetResponse = await env.ASSETS.fetch(assetRequest);
+      const response = new Response(assetResponse.body, assetResponse);
+      response.headers.set('Cache-Control', 'private, no-store');
+      response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
 
-      return new Response(assetResponse.body, {
-        headers,
-      });
+      return response;
     }
 
     return env.ASSETS.fetch(request);
