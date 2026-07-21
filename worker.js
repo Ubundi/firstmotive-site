@@ -29,13 +29,27 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    if (isInternalDeckPath(url.pathname) && !hasValidPassword(request, env.INTERNAL_DECKS_PASSWORD ?? '')) {
-      return new Response('Authentication required.', {
-        status: 401,
-        headers: {
-          'WWW-Authenticate': 'Basic realm="First Motive internal decks", charset="UTF-8"',
-          'Cache-Control': 'no-store',
-        },
+    if (isInternalDeckPath(url.pathname)) {
+      if (!hasValidPassword(request, env.INTERNAL_DECKS_PASSWORD ?? '')) {
+        return new Response('Authentication required.', {
+          status: 401,
+          headers: {
+            'WWW-Authenticate': 'Basic realm="First Motive internal decks", charset="UTF-8"',
+            'Cache-Control': 'no-store',
+            'X-Robots-Tag': 'noindex, nofollow, noarchive',
+          },
+        });
+      }
+
+      const assetResponse = await env.ASSETS.fetch(request);
+      const headers = new Headers(assetResponse.headers);
+      headers.set('Cache-Control', 'private, no-store');
+      headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+
+      return new Response(assetResponse.body, {
+        status: assetResponse.status,
+        statusText: assetResponse.statusText,
+        headers,
       });
     }
 
