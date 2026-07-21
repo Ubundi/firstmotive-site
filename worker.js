@@ -48,7 +48,6 @@ export default {
 
       return new Response(assetResponse.body, {
         status: assetResponse.status,
-        statusText: assetResponse.statusText,
         headers,
       });
     }
