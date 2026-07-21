@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tactile Sensors — how they work</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600;650&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+<style>
+:root{
+  --bg:#08090a; --panel:#0f1011; --line:#23252a;
+  --text:#ffffff; --muted:#8a8f98; --mist:#d0d6e0;
+  --teal:#e4f222; --orange:#ff8a3d; --amber:#e4f222; --rose:#e4f222; --violet:#e4f222;
+  --ok:#e4f222; --no:#8a8f98;
+  --d:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--d);font-feature-settings:'cv01' on,'ss03' on,'zero' on;overflow:hidden}
+
+.deck{position:relative;height:100vh;width:100%}
+.slide{
+  position:absolute;inset:0;padding:44px 56px 92px;
+  display:none;flex-direction:column;overflow:hidden;
+}
+.slide:nth-of-type(n+7):nth-of-type(-n+13){padding-left:86px;padding-right:86px}
+.slide[data-on]{display:flex}
+.slide:before{content:"";position:absolute;inset:-20%;pointer-events:none;opacity:.32;background:
+  radial-gradient(circle at 18% 24%,rgba(228,242,34,.055),transparent 22%),
+  linear-gradient(115deg,transparent 48%,rgba(255,255,255,.022) 50%,transparent 52%);
+  transform:translate3d(-1.5%,0,0);animation:ambientDrift 13s ease-in-out infinite alternate}
+.slide:nth-of-type(3n):before{animation-duration:17s;animation-direction:alternate-reverse}
+.slide > *{position:relative;z-index:1}
+.slide[data-on] > :not(.split):not(.videoGrid):not(.vs):not(.cards):not(.decisionRail):not(.feedbackLoop):not(.defs):not(.nums){animation:riseIn .52s both}
+.slide[data-on] .split,.slide[data-on] .videoGrid,.slide[data-on] .vs,.slide[data-on] .cards,.slide[data-on] .decisionRail,.slide[data-on] .feedbackLoop,.slide[data-on] .defs,.slide[data-on] .nums{animation:riseIn .62s .08s both}
+@keyframes ambientDrift{to{transform:translate3d(2%,1.5%,0) scale(1.04)}}
+@keyframes riseIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:760px){.slide,.slide:nth-of-type(n+7):nth-of-type(-n+13){padding:28px 20px 92px}}
+
+.eyebrow{font:500 12px/1.2 var(--d);letter-spacing:.01em;text-transform:none;color:var(--muted);margin-bottom:14px}
+h1{font:510 clamp(30px,6vw,62px)/1 var(--d);letter-spacing:-.022em;margin-bottom:16px}
+h2{font:510 clamp(24px,3.6vw,40px)/1.1 var(--d);letter-spacing:-.022em;margin-bottom:10px}
+.sub{color:var(--muted);font-size:clamp(15px,1.6vw,18px);max-width:64ch;line-height:1.5}
+
+.split{display:grid;grid-template-columns:1fr 1.15fr;gap:32px;flex:1;min-height:0;margin-top:22px}
+@media(max-width:860px){.split{grid-template-columns:1fr;gap:16px}}
+
+.stageBox{position:relative;background:var(--panel);border:0.5px solid var(--line);border-radius:12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.015);overflow:hidden;min-height:240px}
+.stageBox canvas{display:block;cursor:grab}
+.stageBox canvas:active{cursor:grabbing}
+.hud{position:absolute;left:12px;bottom:12px;right:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.hud .tip{font:450 11px/1 var(--d);letter-spacing:.01em;text-transform:none;color:var(--muted)}
+.hud input[type=range]{-webkit-appearance:none;appearance:none;flex:1;min-width:80px;height:2px;background:var(--line);border-radius:2px}
+.hud input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:var(--teal);cursor:pointer}
+.hud input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:var(--teal);cursor:pointer}
+
+.info{display:flex;flex-direction:column;gap:14px;overflow-y:auto;min-height:0;padding-right:4px}
+.info::-webkit-scrollbar{width:6px}.info::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+
+.layers{display:flex;flex-direction:column;gap:6px}
+.layer{
+  display:flex;gap:10px;align-items:baseline;padding:8px 11px;
+  background:rgba(255,255,255,.02);border:0.5px solid var(--line);border-radius:6px;font-size:14px;
+}
+.layer b{font:500 11px/1.4 var(--d);letter-spacing:.01em;text-transform:none;color:var(--muted);min-width:52px}
+.layer .sw{width:13px;height:13px;border-radius:3px;flex:none;align-self:center;border:1px solid rgba(255,255,255,.18);box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+
+.steps{display:flex;flex-direction:column;gap:8px}
+.step{display:flex;gap:11px;align-items:flex-start;font-size:15px;line-height:1.45}
+.step i{
+  font:600 11px/20px var(--d);width:20px;height:20px;border-radius:50%;text-align:center;flex:none;
+  background:var(--line);color:var(--text);font-style:normal;margin-top:2px;
+}
+
+.btns{display:flex;gap:8px;flex-wrap:wrap}
+.btns button{
+  font:400 13px var(--d);letter-spacing:-.011em;padding:8px 12px;border-radius:6px;cursor:pointer;
+  background:transparent;border:0.5px solid var(--line);color:var(--mist);transition:.15s;
+}
+.btns button:hover{border-color:var(--mist);color:var(--text)}
+.btns button[aria-pressed=true]{background:var(--teal);border-color:var(--teal);color:var(--bg)}
+
+.reads{display:grid;grid-template-columns:repeat(auto-fit,minmax(84px,1fr));gap:8px}
+.read{background:rgba(255,255,255,.02);border:0.5px solid var(--line);border-radius:6px;padding:9px 11px}
+.read span{display:block;font:500 10px/1.4 var(--d);letter-spacing:.01em;text-transform:none;color:var(--muted)}
+.read b{font:500 22px/1.2 var(--d);letter-spacing:-.02em}
+.t,.a,.r,.v{color:var(--mist)}
+
+.flag{padding:9px 12px;border-radius:6px;font:500 12px var(--d);border:1px solid var(--line);color:var(--muted)}
+.flag.no{color:var(--no);border-color:#43241D;background:#1B100D}
+.flag.ok{color:var(--ok);border-color:#1E3F2E;background:#0D1C14}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)}
+th{font:500 11px var(--d);letter-spacing:.01em;text-transform:none;color:var(--muted)}
+td:first-child{color:var(--muted)}
+.win{color:var(--ok);font-weight:600}.lose{color:var(--no);font-weight:600}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:26px}
+.card{background:rgba(255,255,255,.02);border:0.5px solid var(--line);border-radius:6px;padding:16px}
+.card h3{font:500 19px var(--d);margin-bottom:6px;letter-spacing:-.012em}
+.card p{color:var(--muted);font-size:14px;line-height:1.5}
+.card .tag{display:inline-block;font:500 11px var(--d);letter-spacing:.01em;text-transform:none;padding:3px 6px;border-radius:4px;border:0.5px solid var(--line);color:var(--muted);margin-bottom:10px}
+.videoGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;flex:1;min-height:0;margin-top:22px}
+.videoCard{display:flex;flex-direction:column;min-height:0;background:var(--panel);border:0.5px solid var(--line);border-radius:12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.015);overflow:hidden}
+.videoCard video{display:block;width:100%;height:min(48vh,420px);min-height:180px;object-fit:contain;background:#05080C}
+.videoCard .videoMeta{padding:13px 16px 16px}
+.videoCard h3{font:500 19px var(--d);margin-bottom:5px;letter-spacing:-.012em}
+.videoCard p{color:var(--muted);font-size:14px;line-height:1.45}
+.videoCard.good{border-color:var(--teal)}.videoCard.good h3{color:var(--text)}
+.videoCard.bad{border-color:var(--line)}.videoCard.bad h3{color:var(--text)}
+.portraitVideoSlide{padding-top:28px}
+.portraitVideoSlide .eyebrow{margin-bottom:6px}.portraitVideoSlide h2{font-size:clamp(26px,3.1vw,36px);margin-bottom:4px}.portraitVideoSlide > .sub{display:none}
+.portraitVideoSlide .videoGrid{grid-template-columns:minmax(0,1fr);margin-top:10px;align-items:stretch}
+.portraitVideoSlide .videoCard{width:min(620px,72vw);margin:0 auto}
+.portraitVideoSlide .videoCard video{height:calc(100vh - 170px);min-height:360px;max-height:690px;object-fit:contain}
+.portraitVideoSlide .videoCard .videoMeta{padding:8px 12px 10px}.portraitVideoSlide .videoCard h3{font-size:16px;margin-bottom:2px}.portraitVideoSlide .videoCard p{font-size:12px;line-height:1.3}
+@media(max-width:760px){.videoGrid{grid-template-columns:1fr;overflow-y:auto}.videoCard video{height:240px}}
+.processorSpecs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.processorSpecs .read{min-height:76px}.processorSpecs .read b{font-size:18px}
+.processorSpecs .read small{display:block;margin-top:4px;color:var(--muted);font:450 11px/1.35 var(--d)}
+@media(max-width:760px){.processorSpecs{grid-template-columns:1fr}}
+
+/* numbered motivation points */
+.nums{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-top:24px}
+.num{background:rgba(255,255,255,.02);border:0.5px solid var(--line);border-radius:6px;padding:16px}
+.num i{font:500 11px var(--d);letter-spacing:.01em;color:var(--teal);font-style:normal;display:block;margin-bottom:8px}
+.num h4{font:500 16px var(--d);margin-bottom:5px}
+.num p{color:var(--muted);font-size:13.5px;line-height:1.45}
+
+/* callout */
+.angle{
+  margin-top:26px;padding:16px 18px;border:0.5px solid var(--line);
+  border-left:2px solid var(--teal);border-radius:6px;max-width:76ch;background:rgba(255,255,255,.02);
+}
+.angle b{display:block;font:500 11px var(--d);letter-spacing:.01em;text-transform:none;color:var(--mist);margin-bottom:8px}
+.angle p{font-size:15.5px;line-height:1.55;color:var(--mist)}
+
+/* two-family split */
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+@media(max-width:760px){.vs{grid-template-columns:1fr}}
+.fam{background:rgba(255,255,255,.02);border:0.5px solid var(--line);border-radius:6px;padding:20px}
+.fam .tag{display:inline-block;font:500 11px var(--d);letter-spacing:.01em;text-transform:none;padding:3px 6px;border-radius:4px;border:0.5px solid var(--line);color:var(--muted);margin-bottom:11px}
+.fam h3{font:500 20px var(--d);margin-bottom:7px;letter-spacing:-.012em}
+.fam .def{font-size:14.5px;line-height:1.5;color:var(--muted);margin-bottom:13px}
+.fam ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.fam li{font:450 13px/1.45 var(--d);color:var(--muted);padding-left:15px;position:relative}
+.fam li:before{content:"·";position:absolute;left:3px;color:var(--teal)}
+
+/* definition rows */
+.defs{display:flex;flex-direction:column;gap:12px;margin-top:20px}
+.drow{background:rgba(255,255,255,.02);border:0.5px solid var(--line);border-radius:6px;padding:17px 19px;border-left:2px solid var(--line)}
+.drow.o,.drow.p,.drow.m{border-left-color:var(--teal)}
+.drow h4{font:500 18px var(--d);margin-bottom:6px;letter-spacing:-.012em}
+.drow h4 em{font:450 14px var(--d);font-style:normal;color:var(--muted);letter-spacing:.01em;margin-left:9px}
+.drow p{font-size:14.5px;line-height:1.5;color:var(--muted)}
+.drow .out{display:inline-block;margin-top:9px;font:600 12px var(--d);padding:4px 10px;border-radius:4px;background:var(--bg);border:1px solid var(--line)}
+
+/* dataset grid */
+.dset{margin-top:18px;border:0.5px solid var(--line);border-radius:9px;overflow:hidden;background:var(--panel)}
+.drowline{display:grid;grid-template-columns:118px repeat(6,1fr);border-bottom:0.5px solid var(--line)}
+.drowline:last-child{border-bottom:0}
+.drowline.head .dc{font:500 10px var(--d);letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.dlab{
+  padding:11px 12px;font:500 11px var(--d);letter-spacing:.06em;color:var(--muted);
+  border-right:0.5px solid var(--line);display:flex;align-items:center;gap:7px;
+}
+.dlab s{width:6px;height:6px;border-radius:50%;background:var(--line);text-decoration:none;flex:none}
+.dc{padding:9px 8px;border-right:0.5px solid var(--line);display:flex;align-items:center;justify-content:center;min-height:46px;transition:background .2s}
+.dc:last-child{border-right:0}
+.dc.on{background:rgba(228,242,34,.07)}
+.dfilm{width:100%;height:22px;border-radius:3px;background:linear-gradient(135deg,#181a1d,#26292e)}
+.dfilm.w{background:linear-gradient(135deg,#1e2023,#2e3238)}
+.dtax{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;width:30px}
+.dtax i{aspect-ratio:1;border-radius:1px;background:var(--teal)}
+.dnum{font:500 11px var(--d);color:var(--muted)}
+.dact{font:600 11px var(--d);color:var(--teal)}
+.drowline.tactile{background:rgba(228,242,34,.05)}
+.drowline.tactile .dlab s{background:var(--teal)}
+.drowline.action{background:rgba(228,242,34,.085)}
+.drowline.action .dlab s{background:var(--teal)}
+.dend{
+  display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap;
+  font:500 11px var(--d);letter-spacing:.06em;color:var(--muted);
+}
+.dend b{padding:4px 10px;border-radius:4px;border:1px solid var(--ok);color:var(--ok)}
+
+nav{
+  position:fixed;left:0;right:0;bottom:0;height:64px;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:0 24px;border-top:0.5px solid var(--orange);background:linear-gradient(transparent,var(--bg) 40%);
+}
+body.yellowNav nav{border-top-color:var(--teal)}
+nav button{
+  font:400 13px var(--d);letter-spacing:-.011em;padding:8px 12px;border-radius:6px;cursor:pointer;
+  background:transparent;border:0.5px solid var(--line);color:var(--mist);
+}
+nav button:hover{border-color:var(--mist);color:var(--text)}
+nav button[disabled]{opacity:.3;cursor:default}
+.dots{display:flex;gap:7px;align-items:flex-end;padding-top:16px}
+.dots i{position:relative;width:7px;height:7px;border-radius:50%;background:var(--line);cursor:pointer;transition:.2s}
+.dots i:before{content:attr(data-number);position:absolute;left:50%;top:-16px;transform:translateX(-50%);font:500 9px/1 var(--d);color:var(--muted)}
+.dots i[data-on]{background:var(--teal);width:20px;border-radius:4px}
+.dots i[data-on]:before{color:var(--teal)}
+.count{font:500 11px var(--d);color:var(--muted);letter-spacing:.01em}
+
+/* diagram language — direct, connected, and deliberately not card-like */
+.diagram{margin-top:24px;max-width:1080px;border:0.5px solid var(--line);border-radius:10px;background:linear-gradient(115deg,rgba(255,255,255,.025),transparent 48%);overflow:hidden}
+.diagram svg{display:block;width:100%;height:auto;min-height:175px}
+.diagram .node{fill:#101113;stroke:#30333a;stroke-width:1}.diagram .node.active{stroke:var(--teal)}
+.diagram text{font-family:var(--d);fill:var(--mist);font-size:14px;letter-spacing:-.2px}.diagram text.small{font-size:11px;fill:var(--muted)}
+.diagram .line{stroke:#444851;stroke-width:1.3;fill:none}.diagram .signal{stroke:var(--teal);stroke-width:2;fill:none;stroke-dasharray:5 7;animation:dash 3.5s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-48}}
+.feedbackLoop{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;align-items:center;margin-top:28px;max-width:1040px;border:0.5px solid var(--line);border-radius:10px;padding:18px;background:rgba(255,255,255,.018)}
+.feedbackStep{min-height:118px;padding:8px 16px;border-left:0.5px solid var(--line)}.feedbackStep:first-child{border-left:0}
+.feedbackStep span{display:block;color:var(--teal);font-size:12px;font-weight:600;margin-bottom:14px}.feedbackStep h3{font-size:18px;font-weight:550;margin-bottom:7px;letter-spacing:-.02em}.feedbackStep p{color:var(--muted);font-size:13px;line-height:1.45}
+.flowArrow{width:38px;height:1px;background:var(--teal);position:relative;animation:arrowPulse 2.8s ease-in-out infinite}.flowArrow:after{content:"";position:absolute;right:0;top:-3px;width:7px;height:7px;border-top:1px solid var(--teal);border-right:1px solid var(--teal);transform:rotate(45deg)}
+@keyframes arrowPulse{50%{opacity:.35;transform:translateX(4px)}}
+.decisionRail{display:grid;grid-template-columns:repeat(3,1fr);margin-top:28px;max-width:1100px;border-top:0.5px solid var(--line);border-bottom:0.5px solid var(--line)}
+.decision{padding:20px 22px 22px;border-left:0.5px solid var(--line);position:relative}.decision:first-child{border-left:0}.decision:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--line);position:absolute;top:-4px;left:22px}.decision.active:before{background:var(--teal);box-shadow:0 0 16px rgba(228,242,34,.4)}
+.decision .tag{display:block;color:var(--muted);font-size:12px;font-weight:500;margin-bottom:16px}.decision h3{font-size:20px;font-weight:550;letter-spacing:-.02em;margin-bottom:8px}.decision p{font-size:14px;line-height:1.5;color:var(--muted)}
+@media(max-width:760px){.feedbackLoop,.decisionRail{grid-template-columns:1fr}.feedbackStep,.decision{border-left:0;border-top:0.5px solid var(--line)}.feedbackStep:first-child,.decision:first-child{border-top:0}.flowArrow{display:none}.diagram{margin-top:16px}}
+
+/* procurement and glove roadmap */
+.procurementMeta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:12px;color:var(--muted);font-size:12px}.procurementMeta b{font-weight:500;color:var(--mist)}
+.statusKey{display:flex;gap:8px;flex-wrap:wrap}.statusKey span,.procStatus{display:inline-flex;align-items:center;white-space:nowrap;font-size:10px;font-weight:600;letter-spacing:.01em;border-radius:999px;padding:3px 7px;border:0.5px solid var(--line)}.delivered{color:#39ff88;border-color:rgba(57,255,136,.7)!important}.ordered{color:#5aa9ff}.toBuy{color:#f5ce65}.replaced{color:var(--muted);text-decoration:line-through}
+.procurementGrid{display:block;margin-top:12px;flex:1;min-height:0}.procurementGroup{border:0.5px solid var(--line);border-radius:8px;overflow:hidden;background:rgba(255,255,255,.014)}.procurementGroup h3{padding:7px 10px;font-size:12px;font-weight:550;letter-spacing:-.01em;border-bottom:0.5px solid var(--line);color:var(--mist)}.procurementTableCard{display:flex;flex-direction:column;height:100%;min-height:0}.procurementTools{display:flex;gap:8px;align-items:center;padding:7px 10px;border-bottom:0.5px solid var(--line);background:rgba(255,255,255,.018)}.procurementTools input,.procurementTools select,.procurementTools button{font:500 11px var(--d);color:var(--mist);background:#101214;border:0.5px solid var(--line);border-radius:5px;padding:5px 7px}.procurementTools input{flex:1;min-width:160px}.procurementTools button{cursor:pointer}.procurementTools button:hover,.procurementTools select:hover{border-color:var(--mist)}.procurementTools .toolCount{margin-left:auto;color:var(--muted);white-space:nowrap}.procurementTableWrap{flex:1;min-height:0;overflow:auto}.procTable{width:100%;margin:0;font-size:13px;table-layout:fixed}.procTable th,.procTable td{padding:3px 7px;border-bottom:0.5px solid rgba(35,37,42,.8);vertical-align:middle;line-height:1.05}.procTable th{font-size:11px;letter-spacing:.04em;color:var(--muted);position:sticky;top:0;background:#101214;z-index:2}.procTable th button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left}.procTable th button:after{content:' ↕';color:#59616d}.procTable th[aria-sort='ascending'] button:after{content:' ↑';color:var(--teal)}.procTable th[aria-sort='descending'] button:after{content:' ↓';color:var(--teal)}.procTable tr:last-child td{border-bottom:0}.procTable td:first-child{color:var(--muted)}.procTable td:nth-child(2){color:var(--mist)}.procTable td:nth-child(3){text-align:center;color:var(--muted)}.procTable td:nth-child(4){text-align:center}.procTable td:nth-child(5){color:var(--muted);white-space:nowrap}.procTable .priceColumn,.procTable td:nth-child(6){display:none}.procTable td:last-child{text-align:center}.procArrival{color:var(--mist)!important}.procImageLink{display:inline-flex;align-items:center;justify-content:center;padding:3px 6px;border:0.5px solid #4b5563;border-radius:4px;color:#9cc7ff;text-decoration:none;font-size:10px}.procImageLink:hover{border-color:#9cc7ff;color:#fff}.procStatus{font-size:11px;padding:2px 6px}
+.gloveRoadmap{display:grid;grid-template-columns:minmax(240px,.8fr) minmax(460px,1.35fr);gap:26px;flex:1;align-items:center;margin-top:20px}.gloveStatement{font-size:clamp(25px,3.5vw,47px);font-weight:510;line-height:1.05;letter-spacing:-.028em;min-width:0}.gloveStatement em{font-style:normal;color:var(--teal)}.gloveMedia{display:grid;grid-template-columns:minmax(150px,.9fr) minmax(250px,1.55fr);gap:14px;align-items:center;min-width:0}.gloveMedia img,.gloveMedia video{display:block;width:100%;height:auto;object-fit:contain;border:0.5px solid var(--line);border-radius:8px;background:#05080C}.gloveMedia img{aspect-ratio:1 / 1}.gloveMedia video{aspect-ratio:16 / 9}.gloveSteps{grid-column:1 / -1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:0.5px solid var(--line);min-width:0}.gloveStep{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:15px 18px 15px 0;border-bottom:0.5px solid var(--line)}.gloveStep+.gloveStep{padding-left:18px;border-left:0.5px solid var(--line)}.gloveStep b{font-size:12px;color:var(--teal);font-weight:600}.gloveStep h3{font-size:17px;font-weight:550;letter-spacing:-.015em}.gloveStep p{font-size:14px;line-height:1.45;color:var(--muted)}
+.closingSlide{justify-content:center;align-items:center;text-align:center;background:radial-gradient(circle at 50% 48%,rgba(228,242,34,.16),transparent 22%),radial-gradient(circle at 57% 54%,rgba(255,138,61,.12),transparent 38%),linear-gradient(135deg,#08090a 16%,#12130b 52%,#17100b 100%)}.closingSlide:before{opacity:.15;background:linear-gradient(125deg,transparent 31%,rgba(255,255,255,.08) 50%,transparent 69%)}.closingSlide h2{max-width:760px;font-size:clamp(42px,6vw,76px);line-height:.98;margin:0}.closingSlide p{margin-top:18px;color:var(--mist);font-size:15px}.closingVisual{display:grid;grid-template-columns:repeat(5,12px);gap:8px;margin:28px auto 0;width:max-content}.closingVisual i{display:block;width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.12);box-shadow:0 0 0 1px rgba(255,255,255,.08)}.closingVisual i:nth-child(8),.closingVisual i:nth-child(12),.closingVisual i:nth-child(13),.closingVisual i:nth-child(14),.closingVisual i:nth-child(18){background:var(--teal);box-shadow:0 0 20px rgba(228,242,34,.75)}
+.procurementSlide{padding-top:28px}.procurementSlide .eyebrow{margin-bottom:6px}.procurementSlide h2{font-size:clamp(26px,3.1vw,36px);margin-bottom:4px}.procurementSlide > .sub{display:none}.procurementSlide .procurementMeta{margin-top:8px}.procurementSlide .procurementGrid{margin-top:12px}.procurementSlide .procTable td,.procurementSlide .procTable th{white-space:nowrap}.procurementSlide .procTable th:nth-child(1),.procurementSlide .procTable td:nth-child(1){width:17%}.procurementSlide .procTable th:nth-child(2),.procurementSlide .procTable td:nth-child(2){width:42%}.procurementSlide .procTable th:nth-child(3),.procurementSlide .procTable td:nth-child(3){width:7%}.procurementSlide .procTable th:nth-child(4),.procurementSlide .procTable td:nth-child(4){width:14%}.procurementSlide .procTable th:nth-child(5),.procurementSlide .procTable td:nth-child(5){width:14%}.procurementSlide .procTable th:nth-child(7),.procurementSlide .procTable td:nth-child(7){width:6%}
+@media(max-width:1100px){.gloveRoadmap{grid-template-columns:minmax(190px,.8fr) minmax(360px,1.2fr);gap:18px}.gloveStep{grid-template-columns:26px 1fr;gap:8px}.gloveStep h3{font-size:15px}.gloveStep p{font-size:12px}}
+@media(max-width:760px){.portraitVideoSlide .videoCard{width:100%}.portraitVideoSlide .videoCard video{height:42vh;min-height:260px}.procurementGrid,.gloveRoadmap{grid-template-columns:1fr}.procurementGrid{overflow-y:auto}.procTable th,.procTable td{padding:4px 6px;font-size:10px}}
+</style>
+</head>
+<body>
+<div class="deck">
+
+
+
+<!-- motivation -->
+<!-- <section class="slide" data-on>
+  <p class="eyebrow">Motivation</p>
+  <h2>Why machines need touch</h2>
+  <p class="sub">When a gripper closes, its own fingers block the camera at the exact moment contact decides success or failure. Touch is the last-millimetre sense vision can't provide.</p>
+  <div class="diagram" aria-label="Contact sensing diagram">
+    <svg viewBox="0 0 980 220" role="img">
+      <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#e4f222"/></marker></defs>
+      <path class="line" d="M172 110 H270 M440 110 H540 M710 110 H808" marker-end="url(#arrow)"/>
+      <path class="signal" d="M172 110 H270 M440 110 H540 M710 110 H808"/>
+      <rect class="node" x="26" y="57" width="146" height="106" rx="9"/><text x="46" y="93">camera view</text><text class="small" x="46" y="121">blocked at contact</text><path d="M53 140 h70" stroke="#8a8f98" stroke-width="2"/><path d="M116 134 l8 6 -8 6" fill="none" stroke="#8a8f98" stroke-width="2"/>
+      <rect class="node active" x="270" y="57" width="170" height="106" rx="9"/><text x="292" y="93">tactile surface</text><text class="small" x="292" y="121">pressure + shear</text><circle cx="373" cy="140" r="10" fill="none" stroke="#e4f222"/><path d="M373 126v28 M359 140h28" stroke="#e4f222" stroke-width="1.5"/>
+      <rect class="node" x="540" y="57" width="170" height="106" rx="9"/><text x="562" y="93">contact event</text><text class="small" x="562" y="121">onset · force · slip</text><path d="M567 140 h86" stroke="#d0d6e0" stroke-width="2"/><circle cx="588" cy="140" r="4" fill="#e4f222"/><circle cx="614" cy="140" r="4" fill="#e4f222"/><circle cx="640" cy="140" r="4" fill="#e4f222"/>
+      <rect class="node" x="808" y="57" width="146" height="106" rx="9"/><text x="830" y="93">grip response</text><text class="small" x="830" y="121">correct in time</text><path d="M841 143 q19 -22 38 0 q19 22 38 0" fill="none" stroke="#d0d6e0" stroke-width="2"/>
+    </svg>
+  </div>
+  <div class="angle">
+    <b>The data angle</b>
+    <p>Robots learn manipulation from demonstrations. The big datasets have vision and motion — but almost no touch. Which sensor you pick decides what that missing touch data can even contain.</p>
+  </div>
+</section> -->
+
+<!-- taxonomy -->
+<section class="slide">
+  <p class="eyebrow">Taxonomy</p>
+  <h2>Two families of tactile sensing</h2>
+  <p class="sub">Every tactile sensor does one job: turn a physical contact into numbers. There are only two ways to do it — and the split decides everything downstream.</p>
+  <div class="vs">
+    <div class="fam">
+      <span class="tag t">Optical</span>
+      <h3>Photograph the contact</h3>
+      <p class="def">A camera inside the fingertip watches a soft gel deform against the object. Contact becomes an <em>image</em>, which is then processed into a height map.</p>
+      <ul>
+        <li>~megapixels of detail</li>
+        <li>25–120 fps — camera-limited</li>
+        <li>20–30 mm thick — needs a light path</li>
+        <li>gel is a consumable that wears</li>
+        <li>force is inferred, not measured</li>
+      </ul>
+    </div>
+    <div class="fam">
+      <span class="tag r">Non-visual</span>
+      <h3>Measure the contact electrically</h3>
+      <p class="def">No camera. A material whose electrical property changes under pressure sits at the contact surface. Contact becomes <em>numbers</em>, directly.</p>
+      <ul>
+        <li>tens to hundreds of points</li>
+        <li>100–500 Hz</li>
+        <li>under 1 mm possible</li>
+        <li>no consumable — stable for months</li>
+        <li>force is measured directly</li>
+      </ul>
+    </div>
+  </div>
+  <div class="angle" style="border-left-color:var(--teal)">
+    <b>The trade</b>
+    <p>Optical buys spatial detail and pays in speed, bulk and wear. Non-visual buys speed, thinness and durability and pays in detail.</p>
+  </div>
+</section>
+
+<!-- the three -->
+<section class="slide">
+  <p class="eyebrow">Part one — the two technologies</p>
+  <h2>What each one actually does</h2>
+  <p class="sub">One optical, one non-visual. The line that matters is the last one in each — how many numbers come out per sensing point.</p>
+  <div class="defs">
+<div class="drow o">
+  <h4>Optical <em>camera + gel</em></h4>
+  <p>Three coloured LEDs light a soft gel from different angles. Press an object in and each surface slope reflects a different mix of colour; a camera underneath records it, and colour maps back to angle, which integrates into a height map of the contact.</p>
+  <span class="out">Output — a depth map: heights in millimetres, computed from the camera frame. Geometry in extraordinary detail.</span>
+</div>
+
+<div class="drow p">
+  <h4>Non-viusal (Piezoresistive) <em>resistance drops when squeezed</em></h4>
+  <p>Carbon particles in soft rubber: press → particles crowd together → electricity flows easier → resistance falls. Copper strips crossing above and below turn one film into a grid, where every crossing is a sensing point.</p>
+  <span class="out">Output — one integer per taxel. Pressure magnitude only, no direction.</span>
+</div>
+    <!-- <div class="drow" style="opacity:.5;border-left-color:var(--line)">
+      <h4>Magnetic <em>part two</em></h4>
+      <p>A third approach, built on a different physical principle entirely. Covered on its own at the end.</p>
+    </div> -->
+  </div>
+</section>
+
+<!-- 1 -->
+<section class="slide">
+  <p class="eyebrow">01 — Optical</p>
+  <h2>A camera photographs a dent</h2>
+  <p class="sub">A soft gel is lit from three sides. Press an object into it and a camera underneath records how the surface deforms.</p>
+  <div class="split">
+    <div class="stageBox" id="s1">
+      <div class="hud"><span class="tip">Drag to rotate</span><input type="range" id="e1" min="0" max="100" value="45"><span class="tip">Explode</span></div>
+    </div>
+    <div class="info">
+      <div class="layers">
+        <div class="layer"><i class="sw" style="background:#34D6CF"></i><b>Top</b>Reflective skin — the surface that touches the object</div>
+        <div class="layer"><i class="sw" style="background:#05202A"></i><b></b>Black markers — printed dots that move sideways under shear</div>
+        <div class="layer"><i class="sw" style="background:rgba(52,214,207,.45)"></i><b></b>Elastomer gel — soft, deforms around the object</div>
+        <div class="layer"><i class="sw" style="background:rgba(159,196,224,.55)"></i><b></b>Clear support window</div>
+        <div class="layer"><i class="sw" style="background:linear-gradient(90deg,#FF5B6A,#59D35F,#4D7BFF)"></i><b></b>Three coloured LEDs — light the gel from different angles</div>
+        <div class="layer"><i class="sw" style="background:#1F2C3C"></i><b>Base</b>Camera + lens — records the lit, deformed surface</div>
+      </div>
+      <div class="steps">
+        <div class="step"><i>1</i><span>Object presses the gel. The skin takes on the object's shape.</span></div>
+        <div class="step"><i>2</i><span>Each LED casts differently coloured shading across the slopes.</span></div>
+        <div class="step"><i>3</i><span>The camera sees colour, and colour maps to surface angle.</span></div>
+        <div class="step"><i>4</i><span>Angles integrate into a 3D height map — the contact shape.</span></div>
+      </div>
+      <div class="btns"><button id="p1b">Press the gel</button></div>
+      <div class="flag">Superb detail · but 25–120 fps, 25 mm thick, gel is a consumable</div>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <p class="eyebrow">02 — Piezoresistive</p>
+  <h2>Squeezing carbon lets current through</h2>
+  <p class="sub">Carbon particles sit in soft plastic. Press, and they touch — electricity flows more easily. Copper strips crossing above and below turn that into a grid of readings.</p>
+  <div class="split">
+    <div class="stageBox" id="s2">
+      <div class="hud"><span class="tip">Drag to rotate</span><input type="range" id="e2" min="0" max="100" value="45"><span class="tip">Explode</span></div>
+    </div>
+    <div class="info">
+      <div class="layers">
+        <div class="layer"><i class="sw" style="background:#F2A53A"></i><b>Top</b>Copper strips — the columns</div>
+        <div class="layer"><i class="sw" style="background:#1A1D21"></i><b>Middle</b>Velostat — carbon particles in soft plastic</div>
+        <div class="layer"><i class="sw" style="background:#C98A22"></i><b>Bottom</b>Copper strips — the rows, crossing at 90°</div>
+      </div>
+      <div class="steps">
+        <div class="step"><i>1</i><span>Relaxed: carbon particles sit apart. Current struggles. High resistance.</span></div>
+        <div class="step"><i>2</i><span>Pressed: particles squeeze together and touch. Low resistance.</span></div>
+        <div class="step"><i>3</i><span>Every row × column crossing is one sensing point — a taxel.</span></div>
+        <div class="step"><i>4</i><span>48 wires give 512 taxels. Wires add; taxels multiply.</span></div>
+      </div>
+      <div class="btns"><button id="p2b">Press</button><button id="p2c">Slide sideways</button></div>
+      <div class="reads">
+        <div class="read"><span>force</span><b class="a" id="r2a">90</b></div>
+        <div class="read"><span>direction</span><b class="a" id="r2b">—</b></div>
+      </div>
+      <div class="flag" id="f2">Idle</div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- 4 -->
+<section class="slide">
+  <p class="eyebrow">03 — Part one comparison</p>
+  <h2>Detail, or practicality</h2>
+  <p class="sub">Optical sees far more. Piezoresistive survives far longer, runs faster, and fits anywhere. Neither can tell you which way a force is pushing.</p>
+  <div class="split" style="grid-template-columns:1fr">
+    <div class="info">
+      <table>
+        <tr><th></th><th>Optical</th><th>Piezoresistive</th></tr>
+        <tr><td>What senses</td><td>camera + gel</td><td>carbon in plastic</td></tr>
+        <tr><td>Measures</td><td>	surface geometry(physical shape, contours, curvature, and area of an object)</td><td>normal pressure(pushing force)</td></tr>
+        <tr><td>Spatial pitch(the gap between sensing points)</td><td class="win">~0.1 mm</td><td>2–3 mm</td></tr>
+        <tr><td>Values per reading</td><td>1 (depth)</td><td>1 (magnitude)</td></tr>
+        <tr><td>Force</td><td>inferred from how much the gel deforms</td><td class="win">measured directly</td></tr>
+        <tr><td>Direction / slip</td><td class="lose">no</td><td class="lose">no</td></tr>
+        <tr><td>Speed</td><td class="lose">25–120 fps</td><td class="win">100 Hz</td></tr>
+        <tr><td>Thickness</td><td class="lose">20–30 mm</td><td class="win">&lt;1 mm</td></tr>
+        <tr><td>Cost</td><td>hundreds of dollars</td><td class="win">low cost</td></tr>
+      </table>
+      <!-- <div class="angle" style="border-left-color:var(--rose)">
+        <b>The gap neither one closes</b>
+        <p>Both report how hard, never which way. An object sliding out of the grip barely moves either reading — which is exactly what part two exists to solve.</p>
+      </div> -->
+    </div>
+  </div>
+</section>
+
+<!-- processor -->
+<section class="slide">
+  <p class="eyebrow">05 — The processor</p>
+  <h2>ESP32-WROOM: the sensor's fast local brain</h2>
+  <p class="sub">This module reads sensor signals, filters them, and sends compact touch events to the rest of the robot without waiting for a remote computer.</p>
+  <div class="split">
+    <div class="stageBox" id="s4">
+      <div class="hud"><span class="tip">Drag to rotate the ESP32-WROOM module</span></div>
+    </div>
+    <div class="info">
+      <div class="processorSpecs">
+        <div class="read"><span>CPU</span><b class="t">Dual-core</b><small>up to 240 MHz for sampling and control</small></div>
+        <div class="read"><span>Wireless</span><b class="a">Wi-Fi + BT</b><small>stream data or receive commands without a cable</small></div>
+        <div class="read"><span>Sensor inputs</span><b class="v">ADC + I²C</b><small>read FSR voltage levels or digital tactile chips</small></div>
+        <div class="read"><span>Real-time work</span><b class="r">Local loop</b><small>filter, threshold, and react before sending telemetry</small></div>
+      </div>
+      <div class="steps">
+        <div class="step"><i>1</i><span>Sample the tactile signal at a steady rate.</span></div>
+        <div class="step"><i>2</i><span>Turn raw readings into contact, force, or slip events.</span></div>
+        <div class="step"><i>3</i><span>Use those events immediately for grip control, then log them for learning.</span></div>
+      </div>
+      <div class="diagram" style="margin-top:0" aria-label="Local tactile processing flow">
+        <svg viewBox="0 0 560 116" role="img">
+          <defs><marker id="arrowSmall" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#e4f222"/></marker></defs>
+          <path class="signal" d="M134 58 H202 M330 58 H398" marker-end="url(#arrowSmall)"/>
+          <rect class="node active" x="14" y="30" width="120" height="55" rx="7"/><text x="31" y="54">FSR / taxel</text><text class="small" x="31" y="72">analog signal</text>
+          <rect class="node" x="202" y="30" width="128" height="55" rx="7"/><text x="219" y="54">ESP32</text><text class="small" x="219" y="72">filter + threshold</text>
+          <rect class="node" x="398" y="30" width="146" height="55" rx="7"/><text x="415" y="54">robot action</text><text class="small" x="415" y="72">grip correction</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- dataset -->
+<section class="slide">
+  <p class="eyebrow">What the data looks like</p>
+  <h2>One row per stream, one column per instant</h2>
+  <div class="dset" id="dset">
+    <div class="drowline head">
+      <div class="dlab" style="color:var(--muted)">stream</div>
+      <div class="dc">t 0.00</div><div class="dc">t 0.03</div><div class="dc">t 0.06</div>
+      <div class="dc">t 0.09</div><div class="dc">t 0.12</div><div class="dc">t 0.15</div>
+    </div>
+    <div class="drowline">
+      <div class="dlab"><s></s>scene cam</div>
+      <div class="dc"><div class="dfilm"></div></div><div class="dc"><div class="dfilm"></div></div>
+      <div class="dc"><div class="dfilm"></div></div><div class="dc"><div class="dfilm"></div></div>
+      <div class="dc"><div class="dfilm"></div></div><div class="dc"><div class="dfilm"></div></div>
+    </div>
+    <div class="drowline">
+      <div class="dlab"><s></s>wrist cam</div>
+      <div class="dc"><div class="dfilm w"></div></div><div class="dc"><div class="dfilm w"></div></div>
+      <div class="dc"><div class="dfilm w"></div></div><div class="dc"><div class="dfilm w"></div></div>
+      <div class="dc"><div class="dfilm w"></div></div><div class="dc"><div class="dfilm w"></div></div>
+    </div>
+    <div class="drowline tactile">
+      <div class="dlab"><s></s>tactile</div>
+      <div class="dc"><div class="dtax" data-p="0"></div></div><div class="dc"><div class="dtax" data-p="0"></div></div>
+      <div class="dc"><div class="dtax" data-p="1"></div></div><div class="dc"><div class="dtax" data-p="2"></div></div>
+      <div class="dc"><div class="dtax" data-p="3"></div></div><div class="dc"><div class="dtax" data-p="3"></div></div>
+    </div>
+    <div class="drowline">
+      <div class="dlab"><s></s>joint angles</div>
+      <div class="dc"><span class="dnum">7 vals</span></div><div class="dc"><span class="dnum">7 vals</span></div>
+      <div class="dc"><span class="dnum">7 vals</span></div><div class="dc"><span class="dnum">7 vals</span></div>
+      <div class="dc"><span class="dnum">7 vals</span></div><div class="dc"><span class="dnum">7 vals</span></div>
+    </div>
+    <div class="drowline action">
+      <div class="dlab"><s></s>action</div>
+      <div class="dc"><span class="dact">move ↓</span></div><div class="dc"><span class="dact">move ↓</span></div>
+      <div class="dc"><span class="dact">close</span></div><div class="dc"><span class="dact">close</span></div>
+      <div class="dc"><span class="dact">close +2</span></div><div class="dc"><span class="dact">lift</span></div>
+    </div>
+    <div class="drowline">
+      <div class="dlab"><s></s>language</div>
+      <div class="dc" style="grid-column:2 / -1;justify-content:flex-start;padding-left:14px"><span class="dnum">"pick up the short can"  —  constant for the whole episode</span></div>
+    </div>
+  </div>
+
+  <!-- <div class="dend">
+    <span>episode ends with an outcome →</span><b>SUCCESS</b>
+  </div>
+
+  <div class="vs" style="margin-top:20px">
+    <div class="fam" style="border-left:3px solid var(--teal)">
+      <h3 style="font-size:17px">The action row is the answer</h3>
+      <p class="def" style="margin-bottom:0">Everything else is input. The model learns to predict this row from the rows above it. Perception datasets — touch paired with object labels — have no action row at all, which is exactly why they can teach a model to recognise but never to act.</p>
+    </div>
+    <div class="fam" style="border-left:3px solid var(--amber)">
+      <h3 style="font-size:17px">The tactile row is the scarce one</h3>
+      <p class="def" style="margin-bottom:0">Large robot datasets carry camera, joint and action rows. Almost none carry a tactile row, because it has to be physically bolted on before recording — it can't be added afterwards.</p>
+    </div>
+  </div> -->
+</section>
+
+<!-- captured demo video -->
+<section class="slide portraitVideoSlide">
+  <p class="eyebrow">The capture, live</p>
+  <h2>What we just recorded</h2>
+  <p class="sub">A single demonstration episode — every stream in the table above, captured in one take on the rig.</p>
+  <div class="videoGrid">
+    <article class="videoCard good">
+      <video controls preload="metadata" playsinline src="videos/IMG_2162.mp4"></video>
+      <!-- <div class="videoMeta">
+        <h3>Raw capture — one episode</h3>
+        <p>Camera, tactile, joint and action streams recorded together against a common clock, exactly as they enter the dataset.</p>
+      </div> -->
+    </article>
+  </div>
+</section>
+
+<!-- procurement status: source = FM FlexiTac Hardware Guide -->
+<section class="slide procurementSlide">
+  <p class="eyebrow">Build readiness</p>
+  <h2>Procurement status</h2>
+  <p class="sub">Complete parts-ordering status from the FM FlexiTac Hardware Guide. The sensor, readout, tools, FSRs and glove materials are all tracked here.</p>
+  <div class="procurementMeta">
+    <b>29 line items</b><span>·</span><span>source: FM FlexiTac Hardware Guide</span>
+    <div class="statusKey"><span class="delivered">Delivered · 20</span><span class="ordered">Ordered · 5</span><span class="toBuy">To buy · 1</span><span class="replaced">Replaced · 3</span></div>
+  </div>
+  <div class="procurementGrid">
+    <section class="procurementGroup procurementTableCard">
+      <h3>All procurement line items</h3>
+      <div class="procurementTools" aria-label="Procurement filters and sorting">
+        <input id="procSearch" type="search" placeholder="Filter parts…" aria-label="Filter parts">
+        <select id="procStatusFilter" aria-label="Filter by status"><option value="">All statuses</option><option>Delivered</option><option>Ordered</option><option>To buy</option><option>Replaced</option></select>
+        <button type="button" id="procReset">Reset</button><span class="toolCount" id="procToolCount">29 shown</span>
+      </div>
+      <div class="procurementTableWrap">
+        <table class="procTable" id="procurementTable">
+          <thead><tr><th data-sort="category" aria-sort="none"><button type="button">Category</button></th><th data-sort="item" aria-sort="none"><button type="button">Part / product</button></th><th data-sort="qty" aria-sort="none"><button type="button">Qty</button></th><th data-sort="status" aria-sort="none"><button type="button">Status</button></th><th data-sort="arrival" aria-sort="none"><button type="button">Expected arrival</button></th><th class="priceColumn" data-sort="total" aria-sort="none"><button type="button">Total</button></th><th>Images</th></tr></thead>
+          <tbody>
+            <tr data-category="Tactile sensor stack" data-status="Ordered" data-qty="1" data-total="0"><td>Tactile sensor stack</td><td>Top and bottom FPC</td><td>1</td><td><span class="procStatus ordered">Ordered</span></td><td class="procArrival">Aug 4 – Aug 11</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=top+bottom+FPC+flexible+flat+cable" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Tactile sensor stack" data-status="Delivered" data-qty=".01" data-total="0"><td>Tactile sensor stack</td><td>Kapton tape, 5 mm × 33 m</td><td>.01</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=Kapton+tape+5mm+33m" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Tactile sensor stack" data-status="Delivered" data-qty=".05" data-total="0"><td>Tactile sensor stack</td><td>Velostat / Linqstat sheet</td><td>.05</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=Velostat+Linqstat+sheet" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Tactile sensor stack" data-status="To buy" data-qty=".01" data-total="0"><td>Tactile sensor stack</td><td>Self-adhesive laminating sheets</td><td>.01</td><td><span class="procStatus toBuy">To buy</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=self+adhesive+laminating+sheets" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Readout board" data-status="Ordered" data-qty="1" data-total="0"><td>Readout board</td><td>PCB board</td><td>1</td><td><span class="procStatus ordered">Ordered</span></td><td class="procArrival">Aug 4 – Aug 11</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=FlexiTac+readout+PCB+board" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Readout board" data-status="Delivered" data-qty="1" data-total="0"><td>Readout board</td><td>ESP32 30-pin development board</td><td>1</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=ESP32+30-pin+development+board" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Ordered" data-qty="1" data-total="0"><td>Cables &amp; passives</td><td>Flexible cable, 32 pin</td><td>1</td><td><span class="procStatus ordered">Ordered</span></td><td class="procArrival">Aug 10 – Sep 8</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=32+pin+FFC+flexible+flat+cable" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Ordered" data-qty="1" data-total="0"><td>Cables &amp; passives</td><td>Flexible cable, 16 pin</td><td>1</td><td><span class="procStatus ordered">Ordered</span></td><td class="procArrival">Aug 10 – Sep 8</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=16+pin+FFC+flexible+flat+cable" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Replaced" data-qty="1" data-total="0"><td>Cables &amp; passives</td><td>Mini USB cable</td><td>1</td><td><span class="procStatus replaced">Replaced</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=mini+USB+cable" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Replaced" data-qty="1" data-total="0"><td>Cables &amp; passives</td><td>20-pin FFC extender</td><td>1</td><td><span class="procStatus replaced">Replaced</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=20+pin+FFC+extender" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Replaced" data-qty="1" data-total="0"><td>Cables &amp; passives</td><td>40-pin FFC extender</td><td>1</td><td><span class="procStatus replaced">Replaced</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=40+pin+FFC+extender" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Ordered" data-qty="2" data-total="0"><td>Cables &amp; passives</td><td>FFC extender, easy install</td><td>2</td><td><span class="procStatus ordered">Ordered</span></td><td class="procArrival">Aug 10 – Sep 8</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=FFC+extender+easy+install" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Delivered" data-qty="—" data-total="0"><td>Cables &amp; passives</td><td>Pure copper tape</td><td>—</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=pure+copper+tape" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Delivered" data-qty="—" data-total="0"><td>Cables &amp; passives</td><td>Jumper wires, male–female</td><td>—</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=male+female+jumper+wires" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Delivered" data-qty="—" data-total="0"><td>Cables &amp; passives</td><td>20-way male headers</td><td>—</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=20-way+male+pin+headers" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Delivered" data-qty="—" data-total="0"><td>Cables &amp; passives</td><td>10 kΩ carbon-film resistors</td><td>—</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=10k+ohm+carbon+film+resistor" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Delivered" data-qty="—" data-total="0"><td>Cables &amp; passives</td><td>10 kΩ multiturn trimpots</td><td>—</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=10k+multiturn+trimpot" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Cables &amp; passives" data-status="Delivered" data-qty="—" data-total="0"><td>Cables &amp; passives</td><td>16-channel multiplexer</td><td>—</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=16-channel+analog+multiplexer" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Wearable materials" data-status="Delivered" data-qty="—" data-total="0"><td>Wearable materials</td><td>Belman Saba Butler cotton gloves</td><td>—</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=Belman+Saba+Butler+cotton+gloves" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Wearable materials" data-status="Delivered" data-qty="2" data-total="0"><td>Wearable materials</td><td>Velostat sheet, Adafruit 1361</td><td>2</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=Adafruit+1361+Velostat+sheet" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Wearable materials" data-status="Delivered" data-qty="6" data-total="0"><td>Wearable materials</td><td>FSR 400, short tail</td><td>6</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=FSR+400+short+tail" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Wearable materials" data-status="Delivered" data-qty="4" data-total="0"><td>Wearable materials</td><td>FSR 402</td><td>4</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=FSR+402+force+sensitive+resistor" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Wearable materials" data-status="Delivered" data-qty="1" data-total="0"><td>Wearable materials</td><td>Conductive thread, Adafruit 640</td><td>1</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>—</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=Adafruit+640+conductive+thread" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Bench hardware" data-status="Delivered" data-qty="1" data-total="138"><td>Bench hardware</td><td>Dekka Adjustable Solder Iron 80W with LCD Display</td><td>1</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>R138.00</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=Dekka+936H+80W+soldering+iron" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Bench hardware" data-status="Delivered" data-qty="2" data-total="44"><td>Bench hardware</td><td>Solder in a Tube – 1mm</td><td>2</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>R44.00</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=1mm+solder+in+a+tube" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Bench hardware" data-status="Delivered" data-qty="1" data-total="58"><td>Bench hardware</td><td>Heat Shrink Kit – 127 Pieces Assorted</td><td>1</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>R58.00</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=127+piece+assorted+heat+shrink+kit" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Bench hardware" data-status="Delivered" data-qty="2" data-total="10"><td>Bench hardware</td><td>Breadboard Mini 170 Tie Points 35 × 45mm</td><td>2</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>R10.00</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=mini+170+tie+point+breadboard" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Bench hardware" data-status="Delivered" data-qty="1" data-total="18"><td>Bench hardware</td><td>Breadboard, Half Size, 400 Tie Points</td><td>1</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>R18.00</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=400+tie+point+half+size+breadboard" target="_blank" rel="noopener">Images</a></td></tr>
+            <tr data-category="Bench hardware" data-status="Delivered" data-qty="1" data-total="148"><td>Bench hardware</td><td>3M High Adhesion Strength Double-Sided Tape</td><td>1</td><td><span class="procStatus delivered">Delivered</span></td><td>—</td><td>R148.00</td><td><a class="procImageLink" href="https://www.google.com/search?tbm=isch&amp;q=3M+468MP+double+sided+tape" target="_blank" rel="noopener">Images</a></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- glove roadmap -->
+<section class="slide">
+  <p class="eyebrow">Next build</p>
+  <h2>The glove is next</h2>
+  <p class="sub">The sensor now moves from a bench test into a wearable input surface, where touch can join the other signals already captured by the rig.</p>
+  <div class="gloveRoadmap">
+    <p class="gloveStatement">Make touch a <em>first-class input</em> alongside vision, motion and action.</p>
+    <div class="gloveMedia" aria-label="FlexiTac tactile hand reference media">
+      <img src="https://flexitac.github.io/static/images/tactile%20hand.jpg" alt="FlexiTac tactile hand">
+      <video controls autoplay muted loop preload="metadata" playsinline src="https://binghao-huang.github.io/Awesome-FlexiTac/static/videos/flexitac.mp4"></video>
+    </div>
+    <div class="gloveSteps">
+      <div class="gloveStep"><b>01</b><div><h3>Integrate the FSRs into the glove</h3></div></div>
+      <div class="gloveStep"><b>02</b><div><h3>Connect the tactile stream to the rig</h3></div></div>
+      <div class="gloveStep"><b>03</b><div><h3>Use the combined inputs for demonstration</h3></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- touch comparison -->
+<section class="slide">
+  <p class="eyebrow">05 — Touch in the loop</p>
+  <h2>Same task. Different outcome.</h2>
+  <p class="sub">The paired runs make the performance gap visible: tactile feedback lets the controller react to contact as it happens, while the no-touch run keeps acting on an incomplete estimate.</p>
+  <div class="videoGrid">
+    <article class="videoCard good">
+      <video controls preload="metadata" playsinline src="videos/00446-ours-compare-touch.mp4"></video>
+      <div class="videoMeta">
+        <h3>With touch — accurate</h3>
+        <p>Contact is observed directly, so the motion can be corrected at the moment the object begins to shift.</p>
+      </div>
+    </article>
+    <article class="videoCard bad">
+      <video controls preload="metadata" playsinline src="videos/00446-wo-touch.mp4"></video>
+      <div class="videoMeta">
+        <h3>Without touch — inaccurate</h3>
+        <p>Vision and motion alone miss the contact state, so small errors persist instead of being corrected.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- second touch comparison -->
+<section class="slide">
+  <p class="eyebrow">Touch in the loop · trial 00581</p>
+  <h2>The result holds on a second run.</h2>
+  <p class="sub">A second comparison shows the same pattern: tactile feedback provides the contact signal needed to keep the action accurate when the physical state changes.</p>
+  <div class="videoGrid">
+    <article class="videoCard good">
+      <video controls preload="metadata" playsinline src="videos/00581-ours-compare-touch.mp4"></video>
+      <div class="videoMeta">
+        <h3>With touch</h3>
+        <p>The controller can observe contact and make a small correction before the error grows.</p>
+      </div>
+    </article>
+    <article class="videoCard bad">
+      <video controls preload="metadata" playsinline src="videos/00581-wo-touch.mp4"></video>
+      <div class="videoMeta">
+        <h3>Without touch</h3>
+        <p>Without a direct contact signal, the controller cannot distinguish a near miss from a stable grasp in time.</p>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- closing -->
+<section class="slide closingSlide">
+  <p class="eyebrow">FM FlexiTac</p>
+  <h2>Touch makes action<br>more certain.</h2>
+  <p>Sense contact. Respond in the moment.</p>
+  <div class="closingVisual" aria-label="Tactile contact pattern">
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+</section>
+
+<!-- touch performance -->
+<!-- <section class="slide">
+  <p class="eyebrow">Why tactile helps</p>
+  <h2>Touch closes the last millimetre.</h2>
+  <p class="sub">Tactile sensing changes the controller from open-loop motion to a short feedback loop around contact.</p>
+  <div class="feedbackLoop" aria-label="Tactile feedback loop">
+    <div class="feedbackStep"><span>01 · detect</span><h3>Find contact sooner</h3><p>The sensor reports the instant the fingers touch, before a camera can infer it from a blocked view.</p></div>
+    <i class="flowArrow" aria-hidden="true"></i>
+    <div class="feedbackStep"><span>02 · correct</span><h3>Correct while moving</h3><p>Force and shear expose misalignment or slip, so the controller can adjust instead of repeating an error.</p></div>
+    <i class="flowArrow" aria-hidden="true"></i>
+    <div class="feedbackStep"><span>03 · finish</span><h3>Use only the force needed</h3><p>Measured contact makes the action gentler and repeatable: enough force to hold, without crushing.</p></div>
+  </div>
+  <div class="angle" style="border-left-color:var(--teal);max-width:78ch">
+    <b>Performance takeaway</b>
+    <p>Touch does not replace vision. It supplies the missing local signal at the exact moment where visual prediction becomes uncertain: contact, force and slip.</p>
+  </div>
+</section> -->
+
+<!-- magnetic slide DISABLED for now — to restore: change class back to "slide" and delete style="display:none" data-disabled -->
+<section class="slide-disabled" style="display:none" data-disabled>
+  <p class="eyebrow">Part two — Magnetic</p>
+  <h2>A magnet floating on rubber</h2>
+  <p class="sub">A third approach on a completely different principle — and the only one of the three that reports which <em>direction</em> a force pushes. A magnet sits in soft rubber above a three-axis Hall chip: press and it moves down, slide and it moves sideways, and the chip measures both separately.</p>
+  <div class="split">
+    <div class="stageBox" id="s3">
+      <div class="hud"><span class="tip">Drag to rotate</span><input type="range" id="e3" min="0" max="100" value="45"><span class="tip">Explode</span></div>
+    </div>
+    <div class="info">
+      <div class="layers">
+        <div class="layer"><i class="sw" style="background:#E85D75"></i><b>Top</b>Magnet — buried in the rubber, centred over the chip</div>
+        <div class="layer"><i class="sw" style="background:rgba(232,93,117,.4)"></i><b>Middle</b>Soft rubber, 3–8 mm — lets the magnet move and springs it back</div>
+        <div class="layer"><i class="sw" style="background:#9B8AE6"></i><b></b>Hall chip — measures magnetic field on three axes at once</div>
+        <div class="layer"><i class="sw" style="background:#16202C"></i><b>Base</b>Circuit board</div>
+      </div>
+      <div class="steps">
+        <div class="step"><i>1</i><span><b>Press:</b> rubber squashes, magnet drops closer to the chip → <b class="v">Z</b> rises. Field strength climbs steeply — a 0.1 mm shift already gives a large signal.</span></div>
+        <div class="step"><i>2</i><span><b>Slide:</b> rubber shears, magnet moves sideways → <b class="r">Y</b> rises while <b class="v">Z</b> barely moves.</span></div>
+        <div class="step"><i>3</i><span>Different motions land in different channels. In carbon film, sliding adds no compression so slip is never captured — here it's a separate number. That separation is why it catches slip.</span></div>
+      </div>
+      <div class="btns"><button id="p3b">Press</button><button id="p3c">Slide sideways</button></div>
+      <div class="reads">
+        <div class="read"><span>X shear</span><b class="t" id="r3x">0.0</b></div>
+        <div class="read"><span>Y shear</span><b class="r" id="r3y">0.0</b></div>
+        <div class="read"><span>Z force</span><b class="v" id="r3z">0.0</b></div>
+      </div>
+      <div class="flag" id="f3">Idle</div>
+      <div class="angle" style="margin-top:2px;border-left-color:var(--rose)">
+        <b>Why it earns its own section</b>
+        <p>Optical and piezoresistive measure a single quantity at each point. Magnetic measures three — magnitude <em>and</em> direction. Output: three numbers per point.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<nav>
+  <button id="prev">← Prev</button>
+  <div class="dots" id="dots"></div>
+  <span class="count" id="count">1 / 6</span>
+  <button id="next">Next →</button>
+</nav>
+
+<script>
+(function(){
+/* ---------- deck ---------- */
+var slides=[].slice.call(document.querySelectorAll('.slide')),cur=0;
+var dots=document.getElementById('dots');
+slides.forEach(function(_,i){var d=document.createElement('i');d.setAttribute('data-number',i+1);d.addEventListener('click',function(){go(i);});dots.appendChild(d);});
+function go(i){
+  cur=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach(function(s,j){j===cur?s.setAttribute('data-on',''):s.removeAttribute('data-on');});
+  document.body.classList.toggle('yellowNav',cur>=6&&cur<=12);
+  [].forEach.call(dots.children,function(d,j){j===cur?d.setAttribute('data-on',''):d.removeAttribute('data-on');});
+  document.getElementById('count').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('prev').disabled=cur===0;
+  document.getElementById('next').disabled=cur===slides.length-1;
+  setTimeout(resizeAll,30);
+}
+document.getElementById('prev').addEventListener('click',function(){go(cur-1);});
+document.getElementById('next').addEventListener('click',function(){go(cur+1);});
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' ')go(cur+1);
+  if(e.key==='ArrowLeft')go(cur-1);
+});
+
+/* ---------- procurement table ---------- */
+(function(){
+  var table=document.getElementById('procurementTable');
+  if(!table)return;
+  var body=table.querySelector('tbody'), rows=[].slice.call(body.querySelectorAll('tr'));
+  var search=document.getElementById('procSearch'), status=document.getElementById('procStatusFilter');
+  var count=document.getElementById('procToolCount'), reset=document.getElementById('procReset');
+  var sortKey='', sortDir=1;
+  var statusOrder={Ordered:0,'To buy':1,Delivered:2,Replaced:3};
+  function apply(){
+    var q=(search.value||'').toLowerCase().trim(), st=status.value, shown=0;
+    rows.forEach(function(row){
+      var match=(!q||row.textContent.toLowerCase().indexOf(q)>-1)&&(!st||row.dataset.status===st);
+      row.hidden=!match;if(match)shown++;
+    });
+    count.textContent=shown+' shown';
+  }
+  function sortRows(){
+    rows.sort(function(a,b){
+      var av=sortKey==='category'?a.dataset.category:sortKey==='status'?statusOrder[a.dataset.status]:sortKey==='qty'?parseFloat(a.dataset.qty)||0:sortKey==='total'?parseFloat(a.dataset.total)||0:a.querySelector('[data-value="'+sortKey+'"]')?.textContent||a.cells[sortKey==='item'?1:sortKey==='arrival'?4:0].textContent;
+      var bv=sortKey==='category'?b.dataset.category:sortKey==='status'?statusOrder[b.dataset.status]:sortKey==='qty'?parseFloat(b.dataset.qty)||0:sortKey==='total'?parseFloat(b.dataset.total)||0:b.querySelector('[data-value="'+sortKey+'"]')?.textContent||b.cells[sortKey==='item'?1:sortKey==='arrival'?4:0].textContent;
+      return String(av).localeCompare(String(bv),undefined,{numeric:true,sensitivity:'base'})*sortDir;
+    });
+    rows.forEach(function(row){body.appendChild(row);});
+  }
+  function updateSortLabels(th){
+    [].forEach.call(table.querySelectorAll('th[data-sort]'),function(h){h.setAttribute('aria-sort',h===th?(sortDir===1?'ascending':'descending'):'none');});
+  }
+  function sortBy(key,th){
+    if(sortKey===key)sortDir*=-1;else{sortKey=key;sortDir=1;}
+    sortRows();
+    updateSortLabels(th);
+    apply();
+  }
+  search.addEventListener('input',apply);status.addEventListener('change',apply);
+  function defaultSort(){sortKey='status';sortDir=1;sortRows();updateSortLabels(table.querySelector('th[data-sort="status"]'));apply();}
+  reset.addEventListener('click',function(){search.value='';status.value='';defaultSort();});
+  [].forEach.call(table.querySelectorAll('th[data-sort]'),function(th){th.querySelector('button').addEventListener('click',function(){sortBy(th.dataset.sort,th);});});
+  defaultSort();
+})();
+
+/* ---------- three.js scene helper ---------- */
+function Stage(hostId,build,camDist){
+  var host=document.getElementById(hostId);
+  var W=host.clientWidth||600,H=host.clientHeight||400;
+  var scene=new THREE.Scene();
+  var cam=new THREE.PerspectiveCamera(38,W/H,0.1,200);
+  cam.position.set(0,0,camDist||14);
+  var rend=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  rend.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  rend.setSize(W,H);
+  host.insertBefore(rend.domElement,host.firstChild);
+
+  scene.add(new THREE.AmbientLight(0xffffff,0.72));
+  var l1=new THREE.DirectionalLight(0xffffff,0.85);l1.position.set(6,10,8);scene.add(l1);
+  var l2=new THREE.DirectionalLight(0x88bbff,0.4);l2.position.set(-7,3,-6);scene.add(l2);
+
+  var g=new THREE.Group();scene.add(g);
+  var parts=build(g);
+  g.rotation.set(-0.42,0.6,0);
+
+  var drag=false,px=0,py=0;
+  rend.domElement.addEventListener('pointerdown',function(e){drag=true;px=e.clientX;py=e.clientY;rend.domElement.setPointerCapture(e.pointerId);});
+  rend.domElement.addEventListener('pointermove',function(e){
+    if(!drag)return;
+    g.rotation.y+=(e.clientX-px)*0.008;
+    g.rotation.x=Math.max(-1.35,Math.min(1.35,g.rotation.x+(e.clientY-py)*0.008));
+    px=e.clientX;py=e.clientY;
+  });
+  ['pointerup','pointercancel','pointerleave'].forEach(function(ev){
+    rend.domElement.addEventListener(ev,function(){drag=false;});
+  });
+
+  function resize(){
+    var w=host.clientWidth,h=host.clientHeight;
+    if(!w||!h)return;
+    cam.aspect=w/h;cam.updateProjectionMatrix();rend.setSize(w,h);
+  }
+  return {g:g,parts:parts,resize:resize,render:function(){rend.render(scene,cam);},spin:function(d){g.rotation.y+=d;}};
+}
+function slab(g,w,h,d,y,color,opacity,name){
+  var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),
+    new THREE.MeshStandardMaterial({color:color,transparent:opacity<1,opacity:opacity,roughness:0.55,metalness:0.12}));
+  m.position.y=y;m.userData.baseY=y;m.name=name||'';g.add(m);return m;
+}
+
+/* ---------- 1. optical ---------- */
+var S1=Stage('s1',function(g){
+  var P={};
+  P.all=[];
+  P.all.push(slab(g,3.4,0.8,3.4,-2.6,0x141C26,1));            // housing
+  P.all.push(slab(g,1.0,0.6,1.0,-1.7,0x1F2C3C,1));            // camera body
+  var lens=new THREE.Mesh(new THREE.CylinderGeometry(0.3,0.3,0.36,24),
+    new THREE.MeshStandardMaterial({color:0x080D13,roughness:0.2,metalness:0.7}));
+  lens.position.y=-1.2;lens.userData.baseY=-1.2;g.add(lens);P.all.push(lens);
+  P.all.push(slab(g,3.1,0.2,3.1,-0.5,0x2E2712,1));            // LED board
+  [0xFF5B6A,0x59D35F,0x4D7BFF].forEach(function(c,i){
+    var a=(i/3)*Math.PI*2+0.4;
+    var s=new THREE.Mesh(new THREE.SphereGeometry(0.16,16,16),
+      new THREE.MeshStandardMaterial({color:c,emissive:c,emissiveIntensity:0.8}));
+    s.position.set(Math.cos(a)*1.25,-0.5,Math.sin(a)*1.25);
+    s.userData.baseY=-0.5;g.add(s);P.all.push(s);
+  });
+  P.all.push(slab(g,3.0,0.3,3.0,0.2,0x9FC4E0,0.24));          // window
+  P.gel=slab(g,2.9,0.62,2.9,0.85,0x34D6CF,0.34);P.all.push(P.gel);
+  P.skin=slab(g,2.9,0.18,2.9,1.35,0x34D6CF,1);P.all.push(P.skin);
+  P.markers=[];
+  for(var i=-1;i<=1;i++)for(var j=-1;j<=1;j++){
+    var mk=new THREE.Mesh(new THREE.SphereGeometry(0.085,10,10),
+      new THREE.MeshStandardMaterial({color:0x05202A}));
+    mk.position.set(i*0.88,1.46,j*0.88);mk.userData.baseY=1.46;
+    mk.userData.hx=i*0.88;mk.userData.hz=j*0.88;
+    g.add(mk);P.markers.push(mk);P.all.push(mk);
+  }
+  P.ball=new THREE.Mesh(new THREE.SphereGeometry(0.62,24,24),
+    new THREE.MeshStandardMaterial({color:0xB4B2A9,roughness:0.6}));
+  P.ball.position.y=3.2;g.add(P.ball);
+  return P;
+},13);
+
+/* ---------- 2. piezoresistive ---------- */
+var S2=Stage('s2',function(g){
+  var P={all:[],rows:[],cols:[]};
+  for(var i=-2;i<=2;i++){
+    var r=slab(g,3.4,0.16,0.34,-0.75,0xC98A22,1);r.position.z=i*0.62;
+    P.rows.push(r);P.all.push(r);
+  }
+  P.velo=slab(g,3.4,0.3,3.4,-0.3,0x1A1D21,1);P.all.push(P.velo);
+  for(var j=-2;j<=2;j++){
+    var c=slab(g,0.34,0.16,3.4,0.1,0xF2A53A,1);c.position.x=j*0.62;
+    P.cols.push(c);P.all.push(c);
+  }
+  P.finger=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,1.1,20),
+    new THREE.MeshStandardMaterial({color:0xB4B2A9,roughness:0.6}));
+  P.finger.position.set(0,2.4,0);g.add(P.finger);
+  return P;
+},12);
+
+/* ---------- 3. magnetic ---------- */
+var S3=Stage('s3',function(g){
+  var P={all:[]};
+  P.all.push(slab(g,3.4,0.3,3.4,-1.5,0x16202C,1));            // pcb
+  P.chip=slab(g,0.9,0.32,0.9,-1.05,0x9B8AE6,1);P.all.push(P.chip);
+  P.rubber=slab(g,3.0,1.7,3.0,0.15,0xE85D75,0.26);P.all.push(P.rubber);
+  P.mag=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,0.34,26),
+    new THREE.MeshStandardMaterial({color:0xE85D75,roughness:0.35,metalness:0.5}));
+  P.mag.position.y=0.55;P.mag.userData.baseY=0.55;g.add(P.mag);P.all.push(P.mag);
+  P.finger=new THREE.Mesh(new THREE.CylinderGeometry(0.42,0.42,1.1,20),
+    new THREE.MeshStandardMaterial({color:0xB4B2A9,roughness:0.6}));
+  P.finger.position.set(0,2.9,0);g.add(P.finger);
+  return P;
+},12);
+
+/* ---------- 4. ESP32-WROOM module ---------- */
+var S4=Stage('s4',function(g){
+  var P={all:[]};
+  var fallback=slab(g,5.8,0.34,2.4,0,0x253449,1,'ESP32-WROOM');
+  P.all.push(fallback);
+  var antenna=slab(g,1.35,0.38,2.4,0.03,0xD8C9A2,1,'antenna');
+  antenna.position.x=2.18;P.all.push(antenna);
+  var chip=slab(g,1.6,0.42,1.35,0.18,0x101820,1,'chip');P.all.push(chip);
+  if(!THREE.GLTFLoader)return P;
+  new THREE.GLTFLoader().load('assets/ESP32Wroom.glb',function(glb){
+    var model=glb.scene;
+    var sourceBox=new THREE.Box3().setFromObject(model);
+    var sourceSize=sourceBox.getSize(new THREE.Vector3());
+    var maxAxis=Math.max(sourceSize.x,sourceSize.y,sourceSize.z)||1;
+    model.scale.setScalar(5.8/maxAxis);
+    var scaledBox=new THREE.Box3().setFromObject(model);
+    var centre=scaledBox.getCenter(new THREE.Vector3());
+    model.position.sub(centre);
+    g.remove(fallback);g.remove(antenna);g.remove(chip);
+    g.add(model);
+  },undefined,function(){
+    // Keep the small procedural module visible if the model cannot load.
+  });
+  return P;
+},12);
+
+/* ---------- explode ---------- */
+function explode(stage,v){
+  stage.parts.all.forEach(function(m,i){
+    if(m.userData.baseY===undefined)return;
+    m.position.y=m.userData.baseY*(1+v*1.5);
+  });
+}
+function wire(id,stage){
+  var el=document.getElementById(id);
+  el.addEventListener('input',function(){explode(stage,el.value/100);});
+  explode(stage,el.value/100);
+}
+wire('e1',S1);wire('e2',S2);wire('e3',S3);
+
+/* ---------- animations ---------- */
+var anim={s1:0,s2:0,s2dir:0,s3:0,s3dir:0};
+document.getElementById('p1b').addEventListener('click',function(){anim.s1=1;});
+document.getElementById('p2b').addEventListener('click',function(){anim.s2=1;anim.s2dir=0;setBtn('p2b','p2c');});
+document.getElementById('p2c').addEventListener('click',function(){anim.s2=1;anim.s2dir=1;setBtn('p2c','p2b');});
+document.getElementById('p3b').addEventListener('click',function(){anim.s3=1;anim.s3dir=0;setBtn('p3b','p3c');});
+document.getElementById('p3c').addEventListener('click',function(){anim.s3=1;anim.s3dir=1;setBtn('p3c','p3b');});
+function setBtn(on,off){
+  document.getElementById(on).setAttribute('aria-pressed','true');
+  document.getElementById(off).setAttribute('aria-pressed','false');
+}
+
+var t=0;
+function loop(){
+  t+=0.016;
+
+  /* optical press */
+  var d1=anim.s1?Math.max(0,Math.sin(t*2.2)*0.5+0.5):0;
+  if(anim.s1&&t>0){
+    S1.parts.ball.position.y=2.2-d1*0.85;
+    S1.parts.gel.scale.y=1-d1*0.3;
+    S1.parts.markers.forEach(function(m){
+      var r=Math.sqrt(m.userData.hx*m.userData.hx+m.userData.hz*m.userData.hz)||0.001;
+      m.position.x=m.userData.hx*(1+d1*0.22/r*0.6);
+      m.position.z=m.userData.hz*(1+d1*0.22/r*0.6);
+    });
+  }
+
+  /* piezoresistive */
+  if(anim.s2){
+    var d2=Math.max(0,Math.sin(t*2.2)*0.5+0.5);
+    if(anim.s2dir===0){
+      S2.parts.finger.position.set(0,1.6-d2*0.75,0);
+      S2.parts.velo.scale.y=1-d2*0.42;
+      setR('r2a',Math.round(90+d2*2400));setR('r2b','—');
+      flag('f2','',d2>0.5?'Contact — '+Math.round(90+d2*2400)+' counts':'Idle');
+    }else{
+      S2.parts.finger.position.set(Math.sin(t*1.6)*1.1,0.95,0);
+      S2.parts.velo.scale.y=0.62;
+      setR('r2a',Math.round(2380+Math.sin(t*4)*14));setR('r2b','—');
+      flag('f2','no','Sliding — number barely moves. Slip undetected.');
+    }
+  }
+
+  /* magnetic */
+  if(anim.s3){
+    var d3=Math.max(0,Math.sin(t*2.2)*0.5+0.5);
+    if(anim.s3dir===0){
+      S3.parts.finger.position.set(0,2.1-d3*0.8,0);
+      S3.parts.rubber.scale.y=1-d3*0.3;
+      S3.parts.mag.position.set(0,0.55-d3*0.55,0);
+      setR('r3x','0.1');setR('r3y','0.2');setR('r3z',(d3*4.5).toFixed(1));
+      flag('f3','',d3>0.5?'Pressing — Z rising, X and Y flat':'Idle');
+    }else{
+      var sx=Math.sin(t*1.6);
+      S3.parts.finger.position.set(sx*1.1,1.35,0);
+      S3.parts.rubber.scale.y=0.72;
+      S3.parts.mag.position.set(sx*0.62,0.14,0);
+      setR('r3x','0.1');setR('r3y',(Math.abs(sx)*3.2).toFixed(1));setR('r3z','4.4');
+      flag('f3','ok','Sliding — Y spikes while Z holds. Slip detected.');
+    }
+  }
+
+  S1.render();S2.render();S3.render();S4.render();
+  requestAnimationFrame(loop);
+}
+function setR(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+function flag(id,cls,txt){var e=document.getElementById(id);if(!e)return;e.className='flag '+cls;e.textContent=txt;}
+
+/* ---------- dataset slide ---------- */
+(function(){
+  var lv=[[0.05,0.05,0.05,0.05],[0.05,0.35,0.4,0.05],[0.2,0.75,0.8,0.25],[0.3,0.95,1,0.4]];
+  [].forEach.call(document.querySelectorAll('.dtax'),function(el){
+    var p=+el.getAttribute('data-p'),row=lv[p];
+    for(var r=0;r<4;r++)for(var c=0;c<4;c++){
+      var i=document.createElement('i');
+      var v=row[c]*(r===0||r===3?0.55:1);
+      i.style.opacity=Math.max(0.06,v).toFixed(2);
+      el.appendChild(i);
+    }
+  });
+  var col=0;
+  setInterval(function(){
+    var rows=document.querySelectorAll('#dset .drowline');
+    [].forEach.call(rows,function(rw){
+      [].forEach.call(rw.querySelectorAll('.dc'),function(c,i){
+        c.classList.toggle('on',i===col);
+      });
+    });
+    col=(col+1)%6;
+  },700);
+})();
+
+function resizeAll(){S1.resize();S2.resize();S3.resize();S4.resize();}
+window.addEventListener('resize',resizeAll);
+setTimeout(resizeAll,60);
+go(0);
+loop();
+})();
+</script>
+</body>
+</html>
