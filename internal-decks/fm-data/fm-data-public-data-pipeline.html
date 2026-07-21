@@ -1,0 +1,1505 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#433b47">
+  <title>fm-data — public data pipeline · First Motive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anonymous+Pro:wght@400;700&amp;family=Manrope:wght@300;400;600;700;800&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --fm-bg: #433b47;
+      --fm-bg-deep: #3a3340;
+      --fm-text: #e8e2d7;
+      --fm-text-muted: rgba(232, 226, 215, 0.72);
+      --fm-text-subtle: rgba(232, 226, 215, 0.56);
+      --fm-text-faint: rgba(232, 226, 215, 0.32);
+      --fm-steel: #7fa9b8;
+      --fm-on-steel: #1f2c33;
+      --fm-sage: #9cb89e;
+      --fm-on-sage: #2a3a2c;
+      --fm-lilac: #9b8fb8;
+      --fm-coral: #d89b9f;
+      --fm-on-coral: #3d2628;
+      --fm-elev-1: rgba(255, 255, 255, 0.04);
+      --fm-elev-2: rgba(255, 255, 255, 0.07);
+      --fm-elev-3: rgba(255, 255, 255, 0.10);
+      --fm-border: rgba(232, 226, 215, 0.10);
+      --fm-border-strong: rgba(232, 226, 215, 0.20);
+      --fm-container: 1280px;
+      --fm-header-h: 62px;
+      --fm-radius-sm: 4px;
+      --fm-radius-md: 8px;
+      --fm-radius-lg: 12px;
+      --fm-pill: 999px;
+      --fm-body: Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --fm-mono: "Anonymous Pro", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+      background: var(--fm-bg);
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--fm-header-h);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      background:
+        radial-gradient(1200px 700px at 85% -10%, rgba(127, 169, 184, 0.10), transparent 60%),
+        radial-gradient(900px 600px at -10% 110%, rgba(156, 184, 158, 0.06), transparent 55%),
+        var(--fm-bg);
+      background-attachment: fixed;
+      color: var(--fm-text);
+      font-family: var(--fm-body);
+      font-size: 15px;
+      line-height: 1.55;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, video { font: inherit; }
+    button { color: inherit; }
+    img, video { display: block; max-width: 100%; }
+
+    ::selection { background: var(--fm-steel); color: var(--fm-on-steel); }
+
+    button:focus-visible,
+    a:focus-visible,
+    video:focus-visible {
+      outline: 3px solid var(--fm-steel);
+      outline-offset: 4px;
+    }
+
+    /* ---------- Header bar ---------- */
+
+    .demo-bar {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 20;
+      min-height: var(--fm-header-h);
+      border-bottom: 1px solid var(--fm-border);
+      background: rgba(58, 51, 64, 0.82);
+      backdrop-filter: blur(14px) saturate(1.2);
+      -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    }
+
+    .demo-bar__progress {
+      position: absolute;
+      inset: 0 auto auto 0;
+      width: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--fm-steel), var(--fm-sage));
+      transition: width 0.25s ease;
+    }
+
+    .demo-bar__inner {
+      width: min(100%, var(--fm-container));
+      min-height: var(--fm-header-h);
+      margin: 0 auto;
+      padding: 0 clamp(16px, 3vw, 40px);
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: clamp(12px, 2vw, 28px);
+    }
+
+    .demo-brand {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .demo-brand__word {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.045em;
+    }
+
+    .demo-brand__word em {
+      font-style: normal;
+      font-weight: 300;
+    }
+
+    .demo-brand__context,
+    .demo-count,
+    .demo-kicker,
+    .demo-section-num,
+    .demo-stage__label,
+    .demo-media__meta,
+    .demo-result__status,
+    .demo-source-note {
+      font-family: var(--fm-mono);
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+    }
+
+    .demo-brand__context {
+      padding: 3px 10px;
+      border: 1px solid var(--fm-border-strong);
+      border-radius: var(--fm-pill);
+      color: var(--fm-steel);
+      font-size: 10px;
+    }
+
+    .demo-nav {
+      justify-self: center;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .demo-nav button {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border: 1px solid transparent;
+      border-radius: var(--fm-pill);
+      background: transparent;
+      color: var(--fm-text-muted);
+      cursor: pointer;
+      font-family: var(--fm-mono);
+      font-size: 11px;
+      font-weight: 700;
+      transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+    }
+
+    .demo-nav button:hover {
+      border-color: var(--fm-border-strong);
+      background: var(--fm-elev-1);
+      color: var(--fm-text);
+      transform: translateY(-1px);
+    }
+
+    .demo-nav button[aria-current="true"] {
+      border-color: transparent;
+      background: var(--fm-steel);
+      color: var(--fm-on-steel);
+    }
+
+    .demo-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .demo-count {
+      color: var(--fm-text-muted);
+      font-size: 11px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .demo-button {
+      min-height: 38px;
+      padding: 9px 18px;
+      border: 1px solid var(--fm-border-strong);
+      border-radius: var(--fm-pill);
+      background: var(--fm-elev-2);
+      color: var(--fm-text);
+      cursor: pointer;
+      font-family: var(--fm-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: filter 0.16s ease, background 0.16s ease, transform 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .demo-button:hover { filter: brightness(1.08); transform: translateY(-1px); }
+    .demo-button:active { transform: translateY(0); }
+
+    .demo-button--primary {
+      border-color: transparent;
+      background: var(--fm-sage);
+      color: var(--fm-on-sage);
+      box-shadow: 0 6px 24px rgba(156, 184, 158, 0.22);
+    }
+
+    .demo-button--primary:hover {
+      box-shadow: 0 10px 32px rgba(156, 184, 158, 0.30);
+    }
+
+    /* ---------- Sections ---------- */
+
+    .demo-section {
+      position: relative;
+      min-height: 100svh;
+      padding: calc(var(--fm-header-h) + clamp(38px, 6vh, 76px)) clamp(18px, 4vw, 56px) clamp(48px, 8vh, 96px);
+      display: grid;
+      align-items: center;
+      border-bottom: 1px solid var(--fm-border);
+      overflow: hidden;
+    }
+
+    .demo-section__inner {
+      position: relative;
+      width: min(100%, var(--fm-container));
+      margin: 0 auto;
+    }
+
+    .demo-section-head {
+      position: relative;
+      margin-bottom: clamp(28px, 4.5vh, 52px);
+    }
+
+    .demo-section-num {
+      position: absolute;
+      top: -0.32em;
+      right: 0;
+      z-index: 0;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(127, 169, 184, 0.28);
+      font-size: clamp(90px, 12vw, 190px);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .demo-section-head h2,
+    .demo-close h2 {
+      position: relative;
+      max-width: 1000px;
+      margin: 0;
+      font-size: clamp(36px, 4.8vw, 66px);
+      font-weight: 700;
+      line-height: 1.03;
+      letter-spacing: -0.038em;
+    }
+
+    .demo-kicker {
+      position: relative;
+      margin: 0 0 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: var(--fm-steel);
+      font-size: clamp(11px, 1vw, 13px);
+    }
+
+    .demo-kicker::before {
+      content: "";
+      width: 34px;
+      height: 1px;
+      background: var(--fm-steel);
+    }
+
+    /* ---------- Hero ---------- */
+
+    .demo-hero {
+      padding: var(--fm-header-h) 0 0;
+    }
+
+    .demo-hero__layout {
+      width: 100%;
+      min-height: calc(100svh - var(--fm-header-h));
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr);
+    }
+
+    .demo-hero__copy {
+      position: relative;
+      padding: clamp(34px, 4.5vw, 66px) clamp(26px, 6vw, 90px);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .demo-hero__copy::before {
+      content: "";
+      position: absolute;
+      top: 12%;
+      left: -30%;
+      width: 70%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(127, 169, 184, 0.14), transparent 65%);
+      filter: blur(10px);
+      pointer-events: none;
+      animation: demo-drift 14s ease-in-out infinite alternate;
+    }
+
+    @keyframes demo-drift {
+      from { transform: translate3d(0, 0, 0); }
+      to { transform: translate3d(12%, 8%, 0); }
+    }
+
+    .demo-wordmark {
+      position: relative;
+      margin: 0 0 clamp(30px, 5vh, 54px);
+      font-size: clamp(28px, 2.9vw, 44px);
+      font-weight: 300;
+      letter-spacing: -0.06em;
+    }
+
+    .demo-wordmark strong { font-weight: 800; }
+
+    .demo-hero__date {
+      position: relative;
+      width: fit-content;
+      margin-bottom: 24px;
+      padding: 8px 16px;
+      border-radius: var(--fm-pill);
+      background: var(--fm-text);
+      color: #39333d;
+      font-family: var(--fm-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .demo-hero h1 {
+      position: relative;
+      max-width: 720px;
+      margin: 0;
+      font-size: clamp(46px, 5.4vw, 76px);
+      font-weight: 700;
+      line-height: 0.98;
+      letter-spacing: -0.048em;
+    }
+
+    .demo-hero h1 .accent {
+      color: var(--fm-steel);
+    }
+
+    .demo-hero__lede {
+      position: relative;
+      max-width: 620px;
+      margin: 26px 0 32px;
+      color: var(--fm-text-muted);
+      font-size: clamp(17px, 1.5vw, 21px);
+      line-height: 1.5;
+    }
+
+    .demo-hero__footer {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .demo-source-note {
+      color: var(--fm-steel);
+      font-size: 11px;
+    }
+
+    .demo-hero__visual {
+      position: relative;
+      margin: 0;
+      min-height: 52svh;
+      overflow: hidden;
+      background: #202734;
+    }
+
+    .demo-hero__visual::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background: linear-gradient(90deg, var(--fm-bg) 0%, rgba(67, 59, 71, 0.35) 22%, transparent 55%);
+      pointer-events: none;
+    }
+
+    .demo-hero__visual::after {
+      content: "Illustrative episode";
+      position: absolute;
+      z-index: 2;
+      right: clamp(18px, 3vw, 40px);
+      bottom: clamp(18px, 3vw, 40px);
+      padding: 8px 15px;
+      border: 1px solid rgba(232, 226, 215, 0.35);
+      border-radius: var(--fm-pill);
+      background: rgba(58, 51, 64, 0.72);
+      backdrop-filter: blur(8px);
+      color: var(--fm-text);
+      font-family: var(--fm-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .demo-hero__visual img {
+      width: 100%;
+      height: 100%;
+      min-height: calc(100svh - var(--fm-header-h));
+      object-fit: cover;
+      object-position: 64% center;
+    }
+
+    /* ---------- Pipeline diagram ---------- */
+
+    .demo-engine__diagram {
+      position: relative;
+      margin-top: clamp(26px, 5vh, 58px);
+    }
+
+    .demo-stages {
+      position: relative;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: clamp(14px, 1.6vw, 22px);
+      list-style: none;
+    }
+
+    .demo-stage {
+      position: relative;
+      min-height: 190px;
+      padding: clamp(22px, 2.3vw, 32px);
+      border: 1px solid var(--fm-border);
+      border-top: 3px solid var(--fm-border-strong);
+      border-radius: var(--fm-radius-md);
+      background: var(--fm-elev-1);
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .demo-stage:hover {
+      transform: translateY(-4px);
+      background: var(--fm-elev-2);
+    }
+
+    .demo-stage--source { border-top-color: var(--fm-steel); }
+    .demo-stage--standardize { border-top-color: var(--fm-text-muted); }
+    .demo-stage--improve { border-top-color: var(--fm-sage); }
+    .demo-stage--prove { border-top-color: var(--fm-text); }
+
+    .demo-stage:not(:last-child)::after {
+      content: "→";
+      position: absolute;
+      z-index: 2;
+      top: 50%;
+      right: calc(clamp(14px, 1.6vw, 22px) * -1 - 15px);
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--fm-border-strong);
+      border-radius: var(--fm-pill);
+      background: var(--fm-bg-deep);
+      color: var(--fm-steel);
+      font-size: 14px;
+      transform: translateY(-50%);
+      animation: demo-nudge 2.6s ease-in-out infinite;
+    }
+
+    @keyframes demo-nudge {
+      0%, 100% { transform: translateY(-50%) translateX(0); }
+      50% { transform: translateY(-50%) translateX(4px); }
+    }
+
+    .demo-stage__label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+      font-size: 11px;
+    }
+
+    .demo-stage__label::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--fm-border);
+    }
+
+    .demo-stage--source .demo-stage__label { color: var(--fm-steel); }
+    .demo-stage--standardize .demo-stage__label { color: var(--fm-text-muted); }
+    .demo-stage--improve .demo-stage__label { color: var(--fm-sage); }
+    .demo-stage--prove .demo-stage__label { color: var(--fm-text); }
+
+    .demo-stage strong {
+      display: block;
+      font-size: clamp(20px, 2vw, 28px);
+      font-weight: 700;
+      line-height: 1.14;
+      letter-spacing: -0.02em;
+    }
+
+    .demo-stage p {
+      margin: 12px 0 0;
+      color: var(--fm-text-muted);
+      font-size: clamp(14px, 1.15vw, 16px);
+    }
+
+    .demo-engine__truth {
+      max-width: 860px;
+      margin: clamp(28px, 4.5vh, 48px) auto 0;
+      padding: clamp(18px, 2.4vw, 28px) clamp(24px, 3vw, 40px);
+      border-left: 3px solid var(--fm-steel);
+      border-radius: 0 var(--fm-radius-md) var(--fm-radius-md) 0;
+      background: var(--fm-elev-1);
+      color: var(--fm-text);
+      font-size: clamp(17px, 1.7vw, 23px);
+      font-weight: 600;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    /* ---------- Media frame ---------- */
+
+    .demo-media {
+      position: relative;
+      border: 1px solid var(--fm-border-strong);
+      border-radius: var(--fm-radius-lg);
+      overflow: hidden;
+      background: #1f1b21;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(127, 169, 184, 0.06);
+    }
+
+    .demo-media__bar {
+      min-height: 46px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      border-bottom: 1px solid var(--fm-border);
+      background: var(--fm-elev-1);
+    }
+
+    .demo-media__meta {
+      color: var(--fm-text-muted);
+      font-size: 10px;
+    }
+
+    .demo-media__status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--fm-sage);
+      font-family: var(--fm-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .demo-media__status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 10px rgba(156, 184, 158, 0.9);
+      animation: demo-pulse 2.4s ease-in-out infinite;
+    }
+
+    @keyframes demo-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
+    }
+
+    .demo-media video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #1f1b21;
+    }
+
+    .demo-media__note {
+      margin: 12px 2px 0;
+      padding: 10px 16px;
+      border-left: 3px solid var(--fm-coral);
+      border-radius: 0 var(--fm-radius-sm) var(--fm-radius-sm) 0;
+      background: var(--fm-elev-1);
+      color: var(--fm-text-muted);
+      font-size: 13px;
+    }
+
+    /* ---------- Seven checks ---------- */
+
+    .demo-checks {
+      margin: clamp(26px, 4.5vh, 46px) 0 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 1px;
+      list-style: none;
+      background: var(--fm-border);
+      border: 1px solid var(--fm-border);
+      border-radius: var(--fm-radius-md);
+      overflow: hidden;
+    }
+
+    .demo-checks li {
+      min-height: 118px;
+      padding: 18px 12px;
+      background: var(--fm-bg-deep);
+      text-align: center;
+      transition: background 0.18s ease;
+    }
+
+    .demo-checks li:hover { background: var(--fm-elev-2); }
+
+    .demo-checks__num {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      margin: 0 auto 14px;
+      border: 1px solid var(--fm-steel);
+      border-radius: 50%;
+      color: var(--fm-steel);
+      font-family: var(--fm-mono);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .demo-checks strong {
+      display: block;
+      font-family: var(--fm-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .demo-checks span:last-child {
+      display: block;
+      margin-top: 8px;
+      color: var(--fm-text-muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    /* ---------- Results ---------- */
+
+    .demo-results {
+      margin: clamp(28px, 4.5vh, 50px) 0 0;
+      padding: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(14px, 1.6vw, 22px);
+      list-style: none;
+    }
+
+    .demo-result {
+      position: relative;
+      min-height: 140px;
+      padding: clamp(20px, 2.2vw, 30px);
+      border: 1px solid var(--fm-border);
+      border-left: 3px solid var(--fm-border-strong);
+      border-radius: var(--fm-radius-md);
+      background: var(--fm-elev-1);
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .demo-result:hover {
+      transform: translateY(-3px);
+      background: var(--fm-elev-2);
+    }
+
+    .demo-result--pass { border-left-color: var(--fm-sage); }
+    .demo-result--stop { border-left-color: var(--fm-coral); }
+    .demo-result--receipt { border-left-color: var(--fm-steel); }
+
+    .demo-result__top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .demo-result h3 {
+      margin: 0;
+      font-size: clamp(19px, 1.8vw, 26px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .demo-result__status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 12px;
+      border: 1px solid var(--fm-border-strong);
+      border-radius: var(--fm-pill);
+      color: var(--fm-text-muted);
+      font-size: 9px;
+      white-space: nowrap;
+    }
+
+    .demo-result__status::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .demo-result--pass .demo-result__status { color: var(--fm-sage); border-color: rgba(156, 184, 158, 0.4); }
+    .demo-result--stop .demo-result__status { color: var(--fm-coral); border-color: rgba(216, 155, 159, 0.4); }
+    .demo-result--receipt .demo-result__status { color: var(--fm-steel); border-color: rgba(127, 169, 184, 0.4); }
+
+    .demo-result p {
+      margin: 14px 0 0;
+      color: var(--fm-text-muted);
+      font-size: clamp(14px, 1.25vw, 17px);
+    }
+
+    /* ---------- Accountability ---------- */
+
+    .demo-accountability__axes {
+      margin: 0 0 clamp(24px, 4vh, 40px);
+      display: grid;
+      grid-template-columns: 3fr 4fr;
+      gap: clamp(12px, 2vw, 24px);
+    }
+
+    .demo-axis {
+      padding: 11px 18px;
+      border-radius: var(--fm-pill);
+      color: var(--fm-on-steel);
+      font-family: var(--fm-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .demo-axis--structure { background: var(--fm-steel); }
+    .demo-axis--evidence { background: var(--fm-sage); color: var(--fm-on-sage); }
+
+    .demo-accountability__grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: clamp(10px, 1.4vw, 18px);
+    }
+
+    .demo-accountability__item {
+      min-width: 0;
+      padding: clamp(18px, 2vw, 26px) clamp(10px, 1.2vw, 16px);
+      border: 1px solid var(--fm-border);
+      border-radius: var(--fm-radius-md);
+      background: var(--fm-elev-1);
+      text-align: center;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .demo-accountability__item:hover {
+      transform: translateY(-3px);
+      background: var(--fm-elev-2);
+    }
+
+    .demo-accountability__circle {
+      width: clamp(46px, 5vw, 70px);
+      height: clamp(46px, 5vw, 70px);
+      margin: 0 auto 16px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--fm-steel);
+      border-radius: 50%;
+      box-shadow: inset 0 0 0 4px var(--fm-bg-deep), 0 0 0 1px rgba(127, 169, 184, 0.15);
+      color: var(--fm-steel);
+      font-family: var(--fm-mono);
+      font-size: clamp(17px, 2vw, 26px);
+      font-weight: 700;
+    }
+
+    .demo-accountability__item:nth-child(n+4) .demo-accountability__circle {
+      border-color: var(--fm-sage);
+      box-shadow: inset 0 0 0 4px var(--fm-bg-deep), 0 0 0 1px rgba(156, 184, 158, 0.15);
+      color: var(--fm-sage);
+    }
+
+    .demo-accountability__item h3 {
+      margin: 0;
+      font-family: var(--fm-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .demo-accountability__item p {
+      margin: 10px auto 0;
+      color: var(--fm-text-muted);
+      font-size: clamp(12px, 1vw, 14px);
+      line-height: 1.4;
+    }
+
+    .demo-callout {
+      position: relative;
+      max-width: 1040px;
+      margin: clamp(40px, 7vh, 80px) auto 0;
+      padding: clamp(26px, 3.2vw, 40px);
+      border-radius: var(--fm-radius-lg);
+      background: var(--fm-text);
+      color: #39333d;
+      font-size: clamp(21px, 2.5vw, 34px);
+      font-weight: 700;
+      line-height: 1.28;
+      letter-spacing: -0.015em;
+      text-align: center;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+    }
+
+    /* ---------- Close ---------- */
+
+    .demo-close h2 {
+      font-size: clamp(56px, 8vw, 116px);
+      line-height: 0.96;
+    }
+
+    .demo-close h2 .accent { color: var(--fm-steel); }
+
+    .demo-close__prompt {
+      max-width: 900px;
+      margin: clamp(24px, 3vw, 40px) 0 0;
+      color: var(--fm-text-muted);
+      font-size: clamp(20px, 2.1vw, 30px);
+      line-height: 1.35;
+    }
+
+    .demo-close__columns {
+      margin-top: clamp(44px, 7vh, 78px);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(24px, 4vw, 54px);
+    }
+
+    .demo-close__column {
+      padding-top: 24px;
+      border-top: 2px solid var(--fm-border-strong);
+    }
+
+    .demo-close__column:nth-child(1) { border-top-color: var(--fm-sage); }
+    .demo-close__column:nth-child(2) { border-top-color: var(--fm-steel); }
+    .demo-close__column:nth-child(3) { border-top-color: var(--fm-coral); }
+
+    .demo-close__column small {
+      display: block;
+      margin-bottom: 12px;
+      color: var(--fm-text-muted);
+      font-family: var(--fm-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .demo-close__column h3 {
+      margin: 0 0 22px;
+      font-size: clamp(24px, 2.4vw, 34px);
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.1;
+    }
+
+    .demo-close__column ul {
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 12px;
+      list-style: none;
+      color: var(--fm-text-muted);
+      font-size: clamp(15px, 1.3vw, 18px);
+    }
+
+    .demo-close__column li {
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .demo-close__column li::before {
+      content: "";
+      position: absolute;
+      top: 0.62em;
+      left: 0;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--fm-text-subtle);
+    }
+
+    .demo-close__result {
+      margin-top: clamp(42px, 6vh, 72px);
+      padding: clamp(26px, 3.2vw, 40px);
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: clamp(20px, 3vw, 40px);
+      border-radius: var(--fm-radius-lg);
+      background: var(--fm-text);
+      color: #39333d;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+    }
+
+    .demo-close__result strong {
+      padding: 8px 14px;
+      border: 1px solid rgba(57, 51, 61, 0.35);
+      border-radius: var(--fm-pill);
+      font-family: var(--fm-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .demo-close__result span {
+      font-size: clamp(20px, 2.4vw, 34px);
+      font-weight: 700;
+      line-height: 1.25;
+      letter-spacing: -0.015em;
+    }
+
+    .demo-boundary {
+      margin-top: 20px;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 20px;
+      border: 1px solid rgba(216, 155, 159, 0.40);
+      border-left: 3px solid var(--fm-coral);
+      border-radius: var(--fm-radius-md);
+      background: rgba(216, 155, 159, 0.06);
+    }
+
+    .demo-boundary strong {
+      color: var(--fm-coral);
+      font-family: var(--fm-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .demo-boundary p {
+      margin: 0;
+      color: var(--fm-text-muted);
+      font-size: clamp(14px, 1.25vw, 17px);
+    }
+
+    .demo-next-proof {
+      margin-top: 20px;
+      padding: 20px 24px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      gap: 20px;
+      border: 1px solid rgba(156, 184, 158, 0.42);
+      border-left: 3px solid var(--fm-sage);
+      border-radius: var(--fm-radius-md);
+      background: rgba(156, 184, 158, 0.07);
+    }
+
+    .demo-next-proof strong {
+      color: var(--fm-sage);
+      font-family: var(--fm-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .demo-next-proof p {
+      margin: 0;
+      color: var(--fm-text-muted);
+      font-size: clamp(14px, 1.25vw, 17px);
+    }
+
+    .demo-noscript {
+      position: fixed;
+      z-index: 30;
+      right: 16px;
+      bottom: 16px;
+      max-width: 420px;
+      padding: 12px 16px;
+      border: 1px solid var(--fm-coral);
+      border-radius: var(--fm-radius-md);
+      background: var(--fm-bg);
+      color: var(--fm-text);
+    }
+
+    /* ---------- Scroll reveal (JS-gated) ---------- */
+
+    html.js .anim {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+      transition-delay: calc(var(--d, 0) * 90ms);
+    }
+
+    html.js .in-view .anim {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---------- Responsive ---------- */
+
+    @media (max-width: 980px) {
+      .demo-brand__context { display: none; }
+      .demo-hero__layout { grid-template-columns: 1fr; }
+      .demo-hero__copy { min-height: calc(100svh - var(--fm-header-h)); }
+      .demo-hero__visual::before {
+        background: linear-gradient(180deg, var(--fm-bg) 0%, rgba(67, 59, 71, 0.3) 18%, transparent 45%);
+      }
+      .demo-hero__visual img { min-height: 60svh; }
+      .demo-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .demo-stage:nth-child(2)::after { display: none; }
+      .demo-checks { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .demo-accountability__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .demo-close__columns { grid-template-columns: 1fr; }
+      .demo-section-num { font-size: clamp(70px, 14vw, 120px); }
+    }
+
+    @media (max-width: 720px) {
+      :root { --fm-header-h: 54px; }
+      .demo-bar__inner { grid-template-columns: auto 1fr auto; }
+      .demo-wordmark { margin-bottom: 42px; }
+      .demo-nav { gap: 2px; }
+      .demo-nav button { width: 26px; height: 26px; font-size: 10px; }
+      .demo-count { display: none; }
+      .demo-button { padding-inline: 12px; }
+      .demo-section-num {
+        top: auto;
+        bottom: -0.15em;
+        font-size: clamp(64px, 20vw, 110px);
+      }
+      .demo-results { grid-template-columns: 1fr; }
+      .demo-checks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .demo-accountability__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .demo-accountability__axes { grid-template-columns: 1fr; }
+      .demo-close__result,
+      .demo-boundary,
+      .demo-next-proof { grid-template-columns: 1fr; gap: 12px; }
+    }
+
+    @media (max-width: 520px) {
+      .demo-brand__word { font-size: 15px; }
+      .demo-nav button:nth-child(2),
+      .demo-nav button:nth-child(3),
+      .demo-nav button:nth-child(4),
+      .demo-nav button:nth-child(5) { display: none; }
+      .demo-stages { grid-template-columns: 1fr; }
+      .demo-stage::after { display: none; }
+      .demo-hero h1 { font-size: clamp(42px, 13vw, 64px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      html.js .anim { opacity: 1; transform: none; transition: none; }
+      .demo-hero__copy::before,
+      .demo-stage::after,
+      .demo-media__status::before { animation: none; }
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    @media print {
+      .demo-bar { display: none; }
+      html.js .anim { opacity: 1; transform: none; }
+      .demo-section { min-height: 100vh; page-break-after: always; padding-top: 48px; }
+      .demo-hero { padding-top: 0; }
+      .demo-hero__layout { min-height: 100vh; }
+      video { display: none; }
+      .demo-media { background: var(--fm-elev-1); }
+    }
+  </style>
+</head>
+<body>
+  <header class="demo-bar" aria-label="Presentation controls">
+    <div class="demo-bar__progress" id="demo-progress"></div>
+    <div class="demo-bar__inner">
+      <div class="demo-brand" aria-label="First Motive fm-data">
+        <span class="demo-brand__word"><em>first</em>motive</span>
+        <span class="demo-brand__context">fm-data</span>
+      </div>
+
+      <nav class="demo-nav" aria-label="Jump to presentation section">
+        <button type="button" data-section="0" aria-label="Go to section 1: Result" aria-current="true">1</button>
+        <button type="button" data-section="1" aria-label="Go to section 2: The engine">2</button>
+        <button type="button" data-section="2" aria-label="Go to section 3: Seven checks video">3</button>
+        <button type="button" data-section="3" aria-label="Go to section 4: Public data pipeline video">4</button>
+        <button type="button" data-section="4" aria-label="Go to section 5: Accountability summary">5</button>
+        <button type="button" data-section="5" aria-label="Go to section 6: Questions">6</button>
+      </nav>
+
+      <div class="demo-actions">
+        <span class="demo-count" id="demo-count" aria-live="polite">01 / 06</span>
+        <button class="demo-button" id="demo-fullscreen" type="button">Full Screen</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="demo-section demo-hero" id="result" aria-labelledby="result-title" data-title="Result">
+      <div class="demo-hero__layout">
+        <div class="demo-hero__copy">
+          <p class="demo-wordmark anim" aria-label="First Motive">first<strong>motive</strong></p>
+          <div class="demo-hero__date anim" style="--d:1">Office Demo · 21 July 2026</div>
+          <h1 id="result-title" class="anim" style="--d:2">fm-data records why episodes <span class="accent">pass or stop.</span></h1>
+          <p class="demo-hero__lede anim" style="--d:3">I tested it on four public datasets. Qualia produced six verified episodes. The other sources exposed missing success evidence, failed outcomes, motion defects, and missing camera data.</p>
+          <div class="demo-hero__footer anim" style="--d:4">
+            <button class="demo-button demo-button--primary" type="button" data-next-section>Begin Walkthrough ↓</button>
+            <span class="demo-source-note">A repeatable review process for robot training data</span>
+          </div>
+        </div>
+        <figure class="demo-hero__visual">
+          <img src="assets/fm-data-illustrative-robot-episode.png" alt="Illustrative robotic arm recording a manipulation episode" width="1672" height="941">
+        </figure>
+      </div>
+    </section>
+
+    <section class="demo-section demo-engine" id="engine" aria-labelledby="engine-title" data-title="The Engine">
+      <div class="demo-section__inner">
+        <header class="demo-section-head">
+          <span class="demo-section-num" aria-hidden="true">02</span>
+          <div>
+            <p class="demo-kicker anim">The engine</p>
+            <h2 id="engine-title" class="anim" style="--d:1">Four different public data formats. One consistent review process.</h2>
+          </div>
+        </header>
+
+        <div class="demo-engine__diagram" role="img" aria-label="The diagram shows how I mapped four public sources to one schema, recorded episode decisions, and reopened the written dataset to verify the output">
+          <ol class="demo-stages">
+            <li class="demo-stage demo-stage--source anim" style="--d:2">
+              <span class="demo-stage__label">01 · Source</span>
+              <strong>Four public sources</strong>
+              <p>Each source arrived with different formats, clocks, vectors, and evidence.</p>
+            </li>
+            <li class="demo-stage demo-stage--standardize anim" style="--d:3">
+              <span class="demo-stage__label">02 · Standardize</span>
+              <strong>Original rates · one episode schema</strong>
+              <p>fm-data checks whether the timestamps line up, then maps each source into one common shape without changing the original files.</p>
+            </li>
+            <li class="demo-stage demo-stage--improve anim" style="--d:4">
+              <span class="demo-stage__label">03 · Decide</span>
+              <strong>Keep · repair · hold · drop</strong>
+              <p>fm-data records a decision and the supporting evidence for every episode.</p>
+            </li>
+            <li class="demo-stage demo-stage--prove anim" style="--d:5">
+              <span class="demo-stage__label">04 · Verify</span>
+              <strong>Write it · open it again · check the receipts</strong>
+              <p>fm-data reopened the clean dataset to confirm another tool could read all six episodes, then checked the recorded reason for each decision.</p>
+            </li>
+          </ol>
+          <p class="demo-engine__truth anim" style="--d:6">The original files stay untouched. fm-data writes repairs and decisions into the canonical dataset.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-section" id="seven-checks" aria-labelledby="seven-checks-title" data-title="Seven Checks">
+      <div class="demo-section__inner">
+        <header class="demo-section-head">
+          <span class="demo-section-num" aria-hidden="true">03</span>
+          <div>
+            <p class="demo-kicker anim">Seven checks</p>
+            <h2 id="seven-checks-title" class="anim" style="--d:1">Seven checks determine whether an episode moves forward</h2>
+          </div>
+        </header>
+
+        <div class="demo-media anim" style="--d:2">
+          <div class="demo-media__bar">
+            <span class="demo-media__meta">Silent · 01:18 · 2560 × 1440</span>
+            <span class="demo-media__status">Local media ready</span>
+          </div>
+          <video id="seven-checks-video" controls playsinline preload="metadata" poster="assets/fm-data-seven-checks-poster.jpg" aria-label="Seven Checks animation">
+            <source src="assets/fm-data-seven-checks.mp4" type="video/mp4">
+            Your browser cannot play the Seven Checks video. Open the MP4 from the assets folder.
+          </video>
+        </div>
+
+        <ol class="demo-checks anim" style="--d:3" aria-label="The seven data quality checks">
+          <li><span class="demo-checks__num">1</span><strong>Ingest</strong><span>Can we open and identify the episode?</span></li>
+          <li><span class="demo-checks__num">2</span><strong>Time</strong><span>Do the streams describe the same moments?</span></li>
+          <li><span class="demo-checks__num">3</span><strong>Numbers</strong><span>Does every number keep its meaning and unit?</span></li>
+          <li><span class="demo-checks__num">4</span><strong>Motion</strong><span>Did the robot follow its commands safely?</span></li>
+          <li><span class="demo-checks__num">5</span><strong>Task</strong><span>Is the intended task clearly named and valid?</span></li>
+          <li><span class="demo-checks__num">6</span><strong>Outcome</strong><span>Did the robot complete that task?</span></li>
+          <li><span class="demo-checks__num">7</span><strong>Images</strong><span>Is the visual record reliable enough to use?</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="demo-section" id="public-pipeline" aria-labelledby="public-pipeline-title" data-title="Public Pipeline">
+      <div class="demo-section__inner">
+        <header class="demo-section-head">
+          <span class="demo-section-num" aria-hidden="true">04</span>
+          <div>
+            <p class="demo-kicker anim">Public data pipeline</p>
+            <h2 id="public-pipeline-title" class="anim" style="--d:1">Different evidence led to different outcomes</h2>
+          </div>
+        </header>
+
+        <div class="demo-media anim" style="--d:2">
+          <div class="demo-media__bar">
+            <span class="demo-media__meta">Silent · 01:40 · 3840 × 2160</span>
+            <span class="demo-media__status">Local media ready</span>
+          </div>
+          <video id="public-pipeline-video" controls playsinline preload="metadata" poster="assets/fm-data-public-data-pipeline-poster.jpg" aria-label="Public Data Pipeline animation">
+            <source src="assets/fm-data-public-data-pipeline.mp4" type="video/mp4">
+            Your browser cannot play the Public Data Pipeline video. Open the MP4 from the assets folder.
+          </video>
+        </div>
+        <p class="demo-media__note anim" style="--d:3">Correction: the animation's "28 in → 8 clean" predates the frozen receipts. The verified result is six emitted episodes from 32 inputs — only the idle-trim repair is emit-eligible.</p>
+
+        <ul class="demo-results" aria-label="Measured outcomes across the four public sources">
+          <li class="demo-result demo-result--pass anim" style="--d:4">
+            <div class="demo-result__top"><h3>Qualia OpenArm</h3><span class="demo-result__status">Verified output</span></div>
+            <p>fm-data accounted for all 13 inputs: 5 kept, 3 repaired, 4 held for review, and 1 dropped. It wrote six episodes to the clean dataset and opened all six again successfully.</p>
+          </li>
+          <li class="demo-result demo-result--stop anim" style="--d:5">
+            <div class="demo-result__top"><h3>Anvil OpenArm</h3><span class="demo-result__status">Held for review</span></div>
+            <p>The episode was readable and its movement looked possible, but the source did not prove success. fm-data held it instead of guessing.</p>
+          </li>
+          <li class="demo-result demo-result--stop anim" style="--d:6">
+            <div class="demo-result__top"><h3>robomimic Can-Paired</h3><span class="demo-result__status">Held at emit</span></div>
+            <p>fm-data removed four known failures and let four labelled successes continue. It then stopped those successes before final output because the required camera evidence was missing.</p>
+          </li>
+          <li class="demo-result demo-result--receipt anim" style="--d:7">
+            <div class="demo-result__top"><h3>ManiSkill PickCube</h3><span class="demo-result__status">Receipts only</span></div>
+            <p>Ten action-only simulations tested the motion check. fm-data found sharp movement changes and recorded them, but the source lacked enough evidence for training-ready output.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="demo-section" id="accountability" aria-labelledby="accountability-title" data-title="Accountability">
+      <div class="demo-section__inner">
+        <header class="demo-section-head">
+          <span class="demo-section-num" aria-hidden="true">05</span>
+          <div>
+            <p class="demo-kicker anim">Demo summary · seven checks</p>
+            <h2 id="accountability-title" class="anim" style="--d:1">I tied each decision to a check and a reason</h2>
+          </div>
+        </header>
+
+        <div class="demo-accountability anim" style="--d:2">
+          <div class="demo-accountability__axes" aria-hidden="true">
+            <span class="demo-axis demo-axis--structure">Structure + Semantics</span>
+            <span class="demo-axis demo-axis--evidence">Behaviour + Evidence</span>
+          </div>
+          <div class="demo-accountability__grid">
+            <article class="demo-accountability__item"><div class="demo-accountability__circle">1</div><h3>Ingest</h3><p>fm-data dropped a duplicate</p></article>
+            <article class="demo-accountability__item"><div class="demo-accountability__circle">2</div><h3>Time</h3><p>fm-data checked 50 Hz and 20 Hz streams on one timeline</p></article>
+            <article class="demo-accountability__item"><div class="demo-accountability__circle">3</div><h3>Numbers</h3><p>fm-data repaired one clearly recoverable reading</p></article>
+            <article class="demo-accountability__item"><div class="demo-accountability__circle">4</div><h3>Motion</h3><p>fm-data found idle, jerk, and command-following faults</p></article>
+            <article class="demo-accountability__item"><div class="demo-accountability__circle">5</div><h3>Task</h3><p>fm-data held a task that could not be verified</p></article>
+            <article class="demo-accountability__item"><div class="demo-accountability__circle">6</div><h3>Outcome</h3><p>fm-data checked success labels against task evidence</p></article>
+            <article class="demo-accountability__item"><div class="demo-accountability__circle">7</div><h3>Images</h3><p>fm-data held frozen and incomplete visual records</p></article>
+          </div>
+        </div>
+
+        <p class="demo-callout anim" style="--d:3">One reason explains one episode. Repeated reasons expose capture problems. A rising straight-pass rate shows that the recorder and capture instructions are improving.</p>
+      </div>
+    </section>
+
+    <section class="demo-section demo-close" id="questions" aria-labelledby="questions-title" data-title="Questions">
+      <div class="demo-section__inner">
+        <p class="demo-kicker anim">06 · Questions + Discussion</p>
+        <h2 id="questions-title" class="anim" style="--d:1">Where should we <span class="accent">prove this next?</span></h2>
+        <p class="demo-close__prompt anim" style="--d:2">One First Motive recorder session and one reviewer will give us the next proof.</p>
+
+        <div class="demo-close__columns">
+          <section class="demo-close__column anim" style="--d:3">
+            <small>Test material</small>
+            <h3>Data from four public sources</h3>
+            <ul>
+              <li>Camera-bearing OpenArm data</li>
+              <li>Paired simulation outcomes</li>
+              <li>Action-only trajectories</li>
+            </ul>
+          </section>
+          <section class="demo-close__column anim" style="--d:4">
+            <small>Review process</small>
+            <h3>Checked each episode</h3>
+            <ul>
+              <li>Checked timing and number meaning</li>
+              <li>Ran seven quality checks</li>
+              <li>Recorded each decision</li>
+            </ul>
+          </section>
+          <section class="demo-close__column anim" style="--d:5">
+            <small>Evidence today</small>
+            <h3>Six verified episodes + receipts</h3>
+            <ul>
+              <li>Six verified Qualia episodes</li>
+              <li>Holds when evidence was weak</li>
+              <li>A receipt for each decision</li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="demo-close__result anim" style="--d:6">
+          <strong>Proven today</strong>
+          <span>I built and tested the part of fm-data that stops weak recordings before training and explains why they stopped.</span>
+        </div>
+
+        <div class="demo-boundary anim" style="--d:7">
+          <strong>Still unproven</strong>
+          <p>I tested data preparation and evidence handling. I have not tested model uplift or acceptance on First Motive hardware.</p>
+        </div>
+
+        <div class="demo-next-proof anim" style="--d:8">
+          <strong>The ask</strong>
+          <p>Choose one First Motive recorder session and one reviewer. I will run the checks that apply, mark checks that need robot actions as not applicable, add reviewed annotations, and package the data, decisions, annotations, and review record into one Evaluation Pack.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <noscript><p class="demo-noscript">The presentation remains readable without JavaScript, but section navigation, keyboard shortcuts, and fullscreen controls require JavaScript.</p></noscript>
+
+  <script>
+    (() => {
+      document.documentElement.classList.add('js');
+
+      const sections = Array.from(document.querySelectorAll('.demo-section'));
+      const navButtons = Array.from(document.querySelectorAll('[data-section]'));
+      const count = document.getElementById('demo-count');
+      const progress = document.getElementById('demo-progress');
+      const fullscreenButton = document.getElementById('demo-fullscreen');
+      const videos = Array.from(document.querySelectorAll('video'));
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let activeIndex = 0;
+      let ticking = false;
+
+      const goToSection = (index) => {
+        const nextIndex = Math.max(0, Math.min(sections.length - 1, index));
+        sections[nextIndex].scrollIntoView({
+          behavior: reduceMotion ? 'auto' : 'smooth',
+          block: 'start'
+        });
+      };
+
+      const setActive = (index) => {
+        if (index === activeIndex && navButtons[index]?.getAttribute('aria-current') === 'true') return;
+        activeIndex = index;
+        navButtons.forEach((button, buttonIndex) => {
+          button.setAttribute('aria-current', buttonIndex === activeIndex ? 'true' : 'false');
+        });
+        count.textContent = `${String(activeIndex + 1).padStart(2, '0')} / ${String(sections.length).padStart(2, '0')}`;
+        progress.style.width = `${(activeIndex / (sections.length - 1)) * 100}%`;
+        document.title = `${String(activeIndex + 1).padStart(2, '0')} · ${sections[activeIndex].dataset.title} · First Motive Public Data Demo`;
+      };
+
+      const updateActiveFromScroll = () => {
+        const viewportCenter = window.innerHeight / 2;
+        let closestIndex = 0;
+        let closestDistance = Number.POSITIVE_INFINITY;
+
+        sections.forEach((section, index) => {
+          const rect = section.getBoundingClientRect();
+          const sectionCenter = rect.top + Math.min(rect.height, window.innerHeight) / 2;
+          const distance = Math.abs(sectionCenter - viewportCenter);
+          if (distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = index;
+          }
+        });
+
+        setActive(closestIndex);
+        ticking = false;
+      };
+
+      navButtons.forEach((button) => {
+        button.addEventListener('click', () => goToSection(Number(button.dataset.section)));
+      });
+
+      document.querySelectorAll('[data-next-section]').forEach((button) => {
+        button.addEventListener('click', () => goToSection(activeIndex + 1));
+      });
+
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          window.requestAnimationFrame(updateActiveFromScroll);
+          ticking = true;
+        }
+      }, { passive: true });
+
+      videos.forEach((video) => {
+        video.addEventListener('play', () => {
+          videos.forEach((otherVideo) => {
+            if (otherVideo !== video && !otherVideo.paused) otherVideo.pause();
+          });
+        });
+      });
+
+      const videoObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting && !entry.target.paused) entry.target.pause();
+        });
+      }, { threshold: 0.12 });
+
+      videos.forEach((video) => videoObserver.observe(video));
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+
+      sections.forEach((section) => revealObserver.observe(section));
+
+      const updateFullscreenLabel = () => {
+        fullscreenButton.textContent = document.fullscreenElement ? 'Exit Full Screen' : 'Full Screen';
+        fullscreenButton.setAttribute('aria-pressed', document.fullscreenElement ? 'true' : 'false');
+      };
+
+      fullscreenButton.addEventListener('click', async () => {
+        try {
+          if (document.fullscreenElement) {
+            await document.exitFullscreen();
+          } else {
+            await document.documentElement.requestFullscreen();
+          }
+        } catch (error) {
+          fullscreenButton.textContent = 'Full Screen Unavailable';
+          fullscreenButton.disabled = true;
+        }
+      });
+
+      document.addEventListener('fullscreenchange', updateFullscreenLabel);
+
+      document.addEventListener('keydown', (event) => {
+        const target = event.target;
+        const isInteractive = target instanceof Element && target.closest('video, button, a, input, select, textarea, [contenteditable="true"]');
+        if (isInteractive || event.altKey || event.ctrlKey || event.metaKey) return;
+
+        if (event.key === 'ArrowDown' || event.key === 'PageDown') {
+          event.preventDefault();
+          goToSection(activeIndex + 1);
+        } else if (event.key === 'ArrowUp' || event.key === 'PageUp') {
+          event.preventDefault();
+          goToSection(activeIndex - 1);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          goToSection(0);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          goToSection(sections.length - 1);
+        } else if (/^[1-6]$/.test(event.key)) {
+          event.preventDefault();
+          goToSection(Number(event.key) - 1);
+        } else if (event.key.toLowerCase() === 'f') {
+          event.preventDefault();
+          fullscreenButton.click();
+        }
+      });
+
+      setActive(0);
+      updateActiveFromScroll();
+      updateFullscreenLabel();
+    })();
+  </script>
+</body>
+</html>
