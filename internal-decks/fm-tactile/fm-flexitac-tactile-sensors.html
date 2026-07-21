@@ -742,6 +742,9 @@ document.addEventListener('keydown',function(e){
   if(e.key==='ArrowRight'||e.key===' ')go(cur+1);
   if(e.key==='ArrowLeft')go(cur-1);
 });
+// Render the first slide before optional interactive media initialises. This
+// keeps the presentation readable if a third-party 3D dependency is blocked.
+go(0);
 
 /* ---------- procurement table ---------- */
 (function(){
@@ -1032,7 +1035,6 @@ function flag(id,cls,txt){var e=document.getElementById(id);if(!e)return;e.class
 function resizeAll(){S1.resize();S2.resize();S3.resize();S4.resize();}
 window.addEventListener('resize',resizeAll);
 setTimeout(resizeAll,60);
-go(0);
 loop();
 })();
 </script>
