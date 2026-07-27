@@ -52,12 +52,12 @@
     </section>
     <dialog class="add-deck-dialog" id="add-deck-dialog" aria-labelledby="add-deck-title">
       <div class="dialog-inner">
-        <div class="dialog-head"><div><h2 id="add-deck-title">Add a deck.</h2><p>Your current internal-decks login is required. Upload a ZIP with one <code>index.html</code> or exactly one HTML entrypoint and its assets.</p></div><button class="close-dialog" id="close-add-deck" type="button" aria-label="Close">×</button></div>
+        <div class="dialog-head"><div><h2 id="add-deck-title">Add a deck.</h2><p>Your current internal-decks login is required. Paste a public Google Drive link to a ZIP; the first HTML entry is found deterministically, including inside nested ZIPs.</p></div><button class="close-dialog" id="close-add-deck" type="button" aria-label="Close">×</button></div>
         <form id="add-deck-form">
           <div class="field"><label for="deck-title">Deck title</label><input id="deck-title" name="title" required maxlength="120" placeholder="e.g. FlexiTac tactile glove"></div>
           <div class="field"><label for="deck-team">Team / contributors</label><input id="deck-team" name="team" required maxlength="120" placeholder="e.g. Retief, Furaha"></div>
           <div class="field"><label for="deck-date">Deck date</label><input id="deck-date" name="date" type="date" required></div>
-          <div class="field"><label for="deck-package">ZIP package</label><input id="deck-package" name="package" type="file" accept=".zip,application/zip" required><small>Keep asset paths relative to the HTML file. Maximum package size: 50 MB.</small></div>
+          <div class="field"><label for="deck-drive-url">Public Google Drive ZIP link</label><input id="deck-drive-url" name="driveUrl" type="url" required maxlength="500" placeholder="https://drive.google.com/file/d/.../view"><small>The Drive file must be public. Keep asset paths relative to the HTML file. ZIP limit: 50 MB.</small></div>
           <p class="upload-status" id="upload-status" role="status"></p>
           <div class="dialog-actions"><button class="cancel" id="cancel-add-deck" type="button">Cancel</button><button class="submit" id="submit-add-deck" type="submit">Upload deck</button></div>
         </form>
@@ -81,9 +81,12 @@
       const dateCell=addTextCell(row,'date','');const date=document.createElement('time');date.dateTime=deck.date;date.textContent=new Date(`${deck.date}T00:00:00Z`).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});dateCell.append(date);
       const actionCell=document.createElement('td');const link=document.createElement('a');link.className='open';link.href=deck.href;link.textContent='Open deck ';const arrow=document.createElement('span');arrow.setAttribute('aria-hidden','true');arrow.textContent='↗';link.append(arrow);actionCell.append(link);row.append(actionCell);deckList.append(row);
     }
-    async function loadUploadedDecks(){try{const response=await fetch('/internal-decks/api/decks',{credentials:'same-origin'});if(!response.ok)return;const body=await response.json();(body.decks||[]).forEach(appendDeck)}catch(error){console.warn('Uploaded decks unavailable',error)}}
-    addDeckForm.onsubmit=async(event)=>{event.preventDefault();submitAddDeck.disabled=true;uploadStatus.className='upload-status';uploadStatus.textContent='Uploading and unpacking…';try{const response=await fetch('/internal-decks/api/decks',{method:'POST',body:new FormData(addDeckForm),credentials:'same-origin'});const body=await response.json();if(!response.ok)throw new Error(body.error||'Upload failed.');appendDeck(body.deck);addDeckForm.reset();deckDate.value=today();uploadStatus.textContent='Deck added.';setTimeout(()=>addDeckDialog.close(),450)}catch(error){uploadStatus.className='upload-status error';uploadStatus.textContent=error.message}finally{submitAddDeck.disabled=false}};
-    loadUploadedDecks();
+    const savedDecksKey='firstmotive.internalDecks';
+    function saveDeck(deck){try{const saved=JSON.parse(localStorage.getItem(savedDecksKey)||'[]').filter(value=>value&&value.href!==deck.href);saved.unshift(deck);localStorage.setItem(savedDecksKey,JSON.stringify(saved.slice(0,50)))}catch(error){console.warn('Deck could not be remembered',error)}}
+    async function loadSavedDecks(){try{const saved=JSON.parse(localStorage.getItem(savedDecksKey)||'[]');saved.filter(deck=>deck&&deck.href).reverse().forEach(appendDeck)}catch(error){console.warn('Saved decks unavailable',error)}}
+    async function loadDecks(){try{const response=await fetch('/internal-decks/api/decks',{credentials:'same-origin'});if(response.ok){const body=await response.json();(body.decks||[]).forEach(appendDeck)}}catch(error){console.warn('Deck index unavailable',error)}await loadSavedDecks()}
+    addDeckForm.onsubmit=async(event)=>{event.preventDefault();submitAddDeck.disabled=true;uploadStatus.className='upload-status';uploadStatus.textContent='Downloading and validating the public ZIP…';try{const response=await fetch('/internal-decks/api/decks',{method:'POST',body:new FormData(addDeckForm),credentials:'same-origin'});const body=await response.json();if(!response.ok)throw new Error(body.error||'Deck could not be added.');saveDeck(body.deck);appendDeck(body.deck);addDeckForm.reset();deckDate.value=today();uploadStatus.textContent='Deck added and remembered in this browser.';setTimeout(()=>addDeckDialog.close(),700)}catch(error){uploadStatus.className='upload-status error';uploadStatus.textContent=error.message}finally{submitAddDeck.disabled=false}};
+    loadDecks();
   </script>
 </body>
 </html>

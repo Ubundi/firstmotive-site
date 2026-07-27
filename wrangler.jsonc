@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "firstmotive-site",
+  "account_id": "eabab345dd3e0638e19efb74cd25110a",
   "main": "worker.js",
   "compatibility_date": "2026-07-21",
   "workers_dev": true,
@@ -8,11 +9,5 @@
     "directory": ".",
     "binding": "ASSETS",
     "run_worker_first": true
-  },
-  "r2_buckets": [
-    {
-      "binding": "DECKS",
-      "bucket_name": "firstmotive-internal-decks"
-    }
-  ]
+  }
 }
