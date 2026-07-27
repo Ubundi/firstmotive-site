@@ -51,33 +51,41 @@
   </section>
 
   <section class="slide">
-    <p class="eyebrow">03 <span>/ sensing principle</span></p><h2>Pressure changes resistance. The circuit makes it readable.</h2><p class="sub">An FSR becomes one half of a voltage divider. When normal force increases, its resistance changes; the ESP32 ADC sees the resulting voltage.</p>
+    <p class="eyebrow">03 <span>/ the build in action</span></p><h2>The glove, <em>working.</em></h2><p class="sub">Press a fingertip and the sensor responds live. These recordings show the same glove, readout and response in two runs.</p>
+    <div class="video-grid">
+      <article class="video-card"><video controls preload="metadata" playsinline src="videos/fsr-glove-2259.mp4"></video><div class="video-meta"><h3>Pressing the glove</h3><p>Touch on the fingertip registers live—the sensor responds as it is pressed.</p></div></article>
+      <article class="video-card"><video controls preload="metadata" playsinline src="videos/fsr-glove-2260.mp4"></video><div class="video-meta"><h3>A second run</h3><p>Same glove, same readout—the response holds, repeatably.</p></div></article>
+    </div>
+  </section>
+
+  <section class="slide">
+    <p class="eyebrow">04 <span>/ sensing principle</span></p><h2>Pressure changes resistance. The circuit makes it readable.</h2><p class="sub">An FSR becomes one half of a voltage divider. When normal force increases, its resistance changes; the ESP32 ADC sees the resulting voltage.</p>
     <div class="grid two" style="flex:1"><div class="panel circuit"><svg viewBox="0 0 620 340" role="img" aria-label="FSR voltage divider to ESP32"><path class="signal" d="M165 122 H285 M386 122 H490"/><path class="line" d="M98 67 V122 H165 M98 122 V270 H490 M336 122 V194"/><circle cx="98" cy="67" r="6" fill="#e4f222"/><text x="35" y="47">3.3 V</text><rect class="box" x="165" y="91" width="121" height="62" rx="7"/><text x="192" y="117">FSR</text><text class="small" x="182" y="137">contact force</text><rect class="box" x="285" y="91" width="101" height="62" rx="7"/><text x="305" y="117">ADC</text><text class="small" x="301" y="137">voltage</text><rect class="box" x="490" y="83" width="104" height="78" rx="7"/><text x="509" y="114">ESP32</text><text class="small" x="509" y="135">sample + log</text><rect class="box" x="291" y="194" width="90" height="48" rx="7"/><text x="307" y="223">10 kΩ</text><text x="48" y="290">GND</text><circle cx="98" cy="270" r="5" fill="#9299a3"/><text class="small" x="180" y="71">higher pressure → changed divider voltage</text></svg></div><div class="panel"><span class="kicker">Why FSR for V1</span><h3>Direct enough to learn from the hand.</h3><p>FSRs do not provide a full pressure image, but they make normal force observable at key points. That is the right first signal for contact onset, grip loading and release.</p><div class="measure"><div><span>input</span><b>force</b></div><div><span>electrical change</span><b>R ↓</b></div><div><span>recorded value</span><b>ADC</b></div></div></div></div>
   </section>
 
   <section class="slide">
-    <p class="eyebrow">04 <span>/ signal path</span></p><h2>From contact to a normal-force record.</h2>
+    <p class="eyebrow">05 <span>/ signal path</span></p><h2>From contact to a normal-force record.</h2>
     <div class="force-row"><div class="force-step"><span>01</span><h3>Press</h3><p>A fingertip or palm presses against an object. The force is normal to the contact surface.</p></div><i class="arrow"></i><div class="force-step"><span>02</span><h3>Sense</h3><p>The FSR’s resistance shifts with the load, moving the analog divider voltage.</p></div><i class="arrow"></i><div class="force-step"><span>03</span><h3>Sample &amp; record</h3><p>The ESP32 reads every channel and writes a timestamped force stream for the demonstration.</p></div></div>
     <div class="panel" style="margin-top:22px;max-width:780px"><p><strong>What V1 measures:</strong> normal force at selected contact points. It does not yet resolve shear direction, full contact geometry or distributed pressure across the entire hand.</p></div>
   </section>
 
   <section class="slide">
-    <p class="eyebrow">05 <span>/ data artifact</span></p><h2>One time axis, five tactile channels.</h2><p class="sub">The recording becomes a compact tactile row that can be aligned with video, robot state or a human demonstration later.</p>
+    <p class="eyebrow">06 <span>/ data artifact</span></p><h2>One time axis, five tactile channels.</h2><p class="sub">The recording becomes a compact tactile row that can be aligned with video, robot state or a human demonstration later.</p>
     <div class="data"><div class="cell head label">stream</div><div class="cell head">t 0.00</div><div class="cell head">t 0.04</div><div class="cell head">t 0.08</div><div class="cell head">t 0.12</div><div class="cell head">t 0.16</div><div class="cell head">t 0.20</div><div class="cell head">t 0.24</div><div class="cell label">FSR 1 · index</div><div class="cell"><i class="bar low"></i></div><div class="cell"><i class="bar low"></i></div><div class="cell contact"><i class="bar med"></i></div><div class="cell contact"><i class="bar"></i></div><div class="cell contact"><i class="bar"></i></div><div class="cell"><i class="bar med"></i></div><div class="cell"><i class="bar low"></i></div><div class="cell label">FSR 2 · middle</div><div class="cell"><i class="bar low"></i></div><div class="cell"><i class="bar low"></i></div><div class="cell"><i class="bar low"></i></div><div class="cell"><i class="bar med"></i></div><div class="cell contact"><i class="bar"></i></div><div class="cell contact"><i class="bar med"></i></div><div class="cell"><i class="bar low"></i></div><div class="cell label">FSR 3–5</div><div class="cell">—</div><div class="cell">—</div><div class="cell">—</div><div class="cell">—</div><div class="cell">—</div><div class="cell">—</div><div class="cell">—</div></div>
   </section>
 
   <section class="slide">
-    <p class="eyebrow">06 <span>/ current limitations</span></p><h2>V1 makes force visible, with deliberate trade-offs.</h2><p class="sub">These are the constraints to resolve as the glove moves from a prototype toward reliable tactile capture.</p>
+    <p class="eyebrow">07 <span>/ current limitations</span></p><h2>V1 makes force visible, with deliberate trade-offs.</h2><p class="sub">These are the constraints to resolve as the glove moves from a prototype toward reliable tactile capture.</p>
     <div class="limitations"><article class="limitation"><span class="limit-number">01</span><h3>Sensor orientation</h3><p>An FSR is most informative when its sensing face is aligned with the contact normal. Glove motion and placement can change that orientation, affecting the measured force.</p></article><article class="limitation"><span class="limit-number">02</span><h3>Limited contact points</h3><p>Five discrete sensors capture selected locations, not the continuous contact field of full skin. Contact between sensors is currently unobserved.</p></article></div>
   </section>
 
   <section class="slide">
-    <p class="eyebrow">07 <span>/ next-generation sensor</span></p><h2>From wired FSRs to a <em>printed flex sensor.</em></h2><p class="sub">In parallel, FlexiTac's rectangular sensor is being reshaped into a hand — a flexible printed grid that replaces the discrete FSRs with dense, repeatable contact points.</p>
+    <p class="eyebrow">08 <span>/ next-generation sensor</span></p><h2>From wired FSRs to a <em>printed flex sensor.</em></h2><p class="sub">In parallel, FlexiTac's rectangular sensor is being reshaped into a hand — a flexible printed grid that replaces the discrete FSRs with dense, repeatable contact points.</p>
     <div class="grid two" style="flex:1"><div class="panel" style="padding:14px;display:flex;align-items:center;justify-content:center"><img src="../../glove-sensor/design/easyeda-export-render.svg" alt="Hand-shaped flex sensor matrix — rendered from the EasyEDA Gerber export" style="width:100%;max-height:52vh;object-fit:contain"></div><div class="panel"><span class="kicker">Current EasyEDA design</span><h3>A matrix in the shape of a hand.</h3><p>Rows and columns of copper electrodes, sized to the glove, form a grid of touch points across the fingers and palm — the manufacturing-grade successor to the FSR layout.</p><div class="measure"><div><span>pieces</span><b>6</b></div><div><span>layout</span><b>rows×cols</b></div><div><span>substrate</span><b>flex</b></div></div></div></div>
   </section>
 
   <section class="slide">
-    <p class="eyebrow">08 <span>/ planned next steps</span></p><h2>The path from V1 to a printed tactile hand.</h2>
+    <p class="eyebrow">09 <span>/ planned next steps</span></p><h2>The path from V1 to a printed tactile hand.</h2>
     <div class="grid three"><article class="panel"><span class="kicker">Design</span><h3>Finish the flex layout</h3><p>Complete the hand-shaped electrode design — connector and routing — so it can be manufactured.</p></article><article class="panel"><span class="kicker">Procure</span><h3>Order on flex</h3><p>Send the design to fabrication as a flexible PCB once the layout and remaining parts are ready.</p></article><article class="panel"><span class="kicker">Assemble</span><h3>Laminate &amp; wire</h3><p>Sandwich the electrodes with Velostat, mount on the glove, and read through the same ESP32 pipeline.</p></article></div>
   </section>
 
