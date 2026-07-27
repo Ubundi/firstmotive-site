@@ -19,7 +19,7 @@ function fixedTimeEqual(left, right) {
 
 function hasValidPassword(request, expectedPassword) {
   const header = request.headers.get('Authorization');
-  if (!expectedPassword || !header?.startsWith('Basic ')) return false;
+  if (!header?.startsWith('Basic ')) return false;
 
   try {
     const credentials = atob(header.slice(6));
