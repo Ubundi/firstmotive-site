@@ -68,6 +68,18 @@
     touch: 0,
     integrity: 0
   };
+  /* Advances only while What we do is on screen; restarted on each enter. */
+  var vizActive = false;
+
+  window.__fmDeckViz = {
+    restart: function () {
+      clocks.lidar = clocks.motion = clocks.touch = clocks.integrity = 0;
+    },
+    setActive: function (on) {
+      vizActive = !!on;
+      if (on) this.restart();
+    }
+  };
 
   fetch('assets/showcase/episode.json')
     .then(function (r) { return r.json(); })
@@ -99,17 +111,19 @@
     off.mask.height = off.body.height = off.heat.height = HH;
     var tactileSmooth = [0, 0, 0, 0, 0];
 
-    /* Wire looping videos */
+    /* Wire looping videos — playback is gated by section visibility. */
     document.querySelectorAll('.mod-viz video').forEach(function (v) {
       v.muted = true;
       v.playsInline = true;
       v.loop = true;
-      if (!reduce) {
+      if (!reduce && vizActive) {
         var p = v.play();
         if (p && p.catch) p.catch(function () {});
       } else {
         v.pause();
-        try { v.currentTime = Math.min(0.4, (v.duration || 1) * 0.2); } catch (e) {}
+        if (reduce) {
+          try { v.currentTime = Math.min(0.4, (v.duration || 1) * 0.2); } catch (e) {}
+        }
       }
     });
 
@@ -585,7 +599,7 @@
     function paint(now) {
       var dt = Math.min(0.08, Math.max(0.016, (now - last) / 1000));
       last = now;
-      if (!reduce) {
+      if (!reduce && vizActive) {
         clocks.lidar = loopT(clocks.lidar + dt, DUR);
         clocks.motion = loopT(clocks.motion + dt, DUR);
         clocks.touch = loopT(clocks.touch + dt, DUR);

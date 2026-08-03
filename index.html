@@ -1685,16 +1685,16 @@
         <div class="mod-viz" aria-hidden="true">
           <div class="viz-vision">
             <div class="viz-cam viz-cam-head">
-              <video src="assets/showcase/head.mp4" muted loop playsinline autoplay preload="auto"></video>
+              <video src="assets/showcase/head.mp4" muted loop playsinline preload="auto"></video>
               <span class="viz-cam-label">HEAD · RGB</span>
               <span class="mod-hz">30 HZ</span>
             </div>
             <div class="viz-cam">
-              <video src="assets/showcase/wrist_left.mp4" muted loop playsinline autoplay preload="auto"></video>
+              <video src="assets/showcase/wrist_left.mp4" muted loop playsinline preload="auto"></video>
               <span class="viz-cam-label">WRIST · L</span>
             </div>
             <div class="viz-cam">
-              <video src="assets/showcase/wrist_right.mp4" muted loop playsinline autoplay preload="auto"></video>
+              <video src="assets/showcase/wrist_right.mp4" muted loop playsinline preload="auto"></video>
               <span class="viz-cam-label">WRIST · R</span>
             </div>
           </div>
@@ -1711,7 +1711,7 @@
         <div class="mod-viz" aria-hidden="true">
           <div class="viz-depth">
             <div class="viz-depth-map">
-              <video src="assets/showcase/head_depth.mp4" muted loop playsinline autoplay preload="auto"></video>
+              <video src="assets/showcase/head_depth.mp4" muted loop playsinline preload="auto"></video>
               <span class="mod-tag">HEAD · DEPTH</span>
             </div>
             <div class="viz-lidar">
@@ -1782,9 +1782,10 @@
   <div class="how-inner">
     <div class="how-media reveal-fade">
       <iframe
-        src="assets/robot-capture-pipeline.html?v=4"
+        id="howPipeline"
+        data-src="assets/robot-capture-pipeline.html?v=4"
+        src="about:blank"
         title="Robot capture pipeline animation"
-        loading="lazy"
         allow="autoplay"
       ></iframe>
     </div>
@@ -2125,12 +2126,107 @@
     if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
   });
 
+  function resetVideos() {
+    deck.querySelectorAll('video').forEach(function (v) {
+      try { v.currentTime = 0; } catch (e) {}
+      if (reduce) {
+        v.pause();
+      } else {
+        var p = v.play();
+        if (p && p.catch) p.catch(function () {});
+      }
+    });
+  }
+
+  function pauseVideos() {
+    deck.querySelectorAll('video').forEach(function (v) { v.pause(); });
+  }
+
+  window.__fmModDeck = {
+    restartFromStart: function () {
+      index = 0;
+      render();
+      resetVideos();
+      if (window.__fmDeckViz) window.__fmDeckViz.setActive(true);
+      resume();
+    },
+    pauseSection: function () {
+      pause();
+      pauseVideos();
+      if (window.__fmDeckViz) window.__fmDeckViz.setActive(false);
+    }
+  };
+
   render();
-  restart();
+  /* Autoplay starts when #what-we-do scrolls into view (see section playback). */
+  pause();
+  pauseVideos();
 })();
 </script>
 <script src="assets/showcase/observe-viz.js"></script>
 <script src="assets/showcase/deck-viz.js"></script>
+<script>
+(function () {
+  if (!('IntersectionObserver' in window)) {
+    if (window.__fmModDeck) window.__fmModDeck.restartFromStart();
+    var iframe = document.getElementById('howPipeline');
+    if (iframe && iframe.dataset.src) iframe.src = iframe.dataset.src;
+    return;
+  }
+
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function watchSection(el, onEnter, onLeave) {
+    if (!el) return;
+    var visible = false;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var now = entry.isIntersecting && entry.intersectionRatio >= 0.28;
+        if (now && !visible) {
+          visible = true;
+          onEnter();
+        } else if (!now && visible) {
+          visible = false;
+          if (onLeave) onLeave();
+        }
+      });
+    }, { threshold: [0, 0.28, 0.5] });
+    io.observe(el);
+  }
+
+  watchSection(
+    document.getElementById('what-we-do'),
+    function () {
+      if (window.__fmModDeck) window.__fmModDeck.restartFromStart();
+    },
+    function () {
+      if (window.__fmModDeck) window.__fmModDeck.pauseSection();
+    }
+  );
+
+  var howFrame = document.getElementById('howPipeline');
+  var howSrc = howFrame && howFrame.dataset.src;
+  watchSection(
+    document.getElementById('how-we-work'),
+    function () {
+      if (!howFrame || !howSrc) return;
+      if (reduce) {
+        if (howFrame.src !== howSrc) howFrame.src = howSrc;
+        return;
+      }
+      /* Remount the embed so the pipeline always starts at frame 0. */
+      howFrame.src = 'about:blank';
+      requestAnimationFrame(function () {
+        howFrame.src = howSrc;
+      });
+    },
+    function () {
+      if (!howFrame || reduce) return;
+      howFrame.src = 'about:blank';
+    }
+  );
+})();
+</script>
 
 </body>
 </html>
