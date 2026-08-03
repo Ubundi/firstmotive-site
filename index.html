@@ -887,13 +887,12 @@
   .hood-inner {
     max-width: 1200px;
     margin: 0 auto;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 580px);
-    gap: clamp(40px, 6vw, 72px);
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(36px, 5vw, 56px);
   }
   .hood-copy {
-    max-width: 560px;
+    max-width: 720px;
   }
   .hood-label {
     font-family: var(--font-mono);
@@ -918,7 +917,7 @@
     font-size: clamp(28px, 3.8vw, 48px);
     line-height: 1.12;
     letter-spacing: -0.025em;
-    max-width: 16ch;
+    max-width: 22ch;
   }
   .hood h2 em {
     font-family: var(--font-serif);
@@ -931,114 +930,503 @@
     font-size: clamp(16px, 1.4vw, 19px);
     line-height: 1.55;
     color: rgba(59, 52, 67, 0.78);
-    max-width: 52ch;
+    max-width: 62ch;
   }
-  .hood-kicker {
-    margin-top: 28px;
-    font-size: clamp(16px, 1.4vw, 19px);
-    line-height: 1.45;
-    font-weight: 500;
-    color: var(--plum);
-  }
-  .hood-cta {
-    margin-top: 36px;
-  }
-  .hood .btn {
-    background: var(--plum);
-    color: var(--bg-cream);
-  }
-  .hood .btn:hover {
-    background: #2a2530;
-    color: var(--bg-cream);
-  }
-
-  /* —— Observe panel (desktop-app wall) —— */
+  /* —— App preview (Under the hood) —— */
   .obs {
+    --obs-good: #B6E0B0;
+    --obs-warn: #e08a94;
+    --obs-teal: #7BA3B8;
+    --obs-panel: #2a2430;
+    --obs-panel-2: #221d28;
+    --obs-ink: #ECE2CF;
+    --obs-muted: rgba(236, 226, 207, 0.55);
+    --obs-faint: rgba(236, 226, 207, 0.28);
+    --obs-line: rgba(236, 226, 207, 0.1);
     position: relative;
-    border: 1px solid rgba(59, 52, 67, 0.18);
-    border-radius: 10px;
-    background:
-      linear-gradient(180deg, #2f2a35 0%, #26222c 100%);
+    width: 100%;
+    height: 720px;
+    border: 1px solid rgba(59, 52, 67, 0.2);
+    border-radius: 12px;
+    background: linear-gradient(180deg, #2f2a35 0%, #241f2b 100%);
     box-shadow:
       0 28px 70px -34px rgba(0, 0, 0, 0.55),
       0 1px 0 rgba(236, 226, 207, 0.06) inset;
     overflow: hidden;
-    color: var(--fg);
+    color: var(--obs-ink);
+    display: flex;
+    flex-direction: column;
   }
   .obs-titlebar {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(236, 226, 207, 0.08);
-    background: rgba(0, 0, 0, 0.18);
-  }
-  .obs-traffic {
-    display: flex;
-    gap: 5px;
+    height: 28px;
+    padding: 0 12px;
     flex: none;
+    background: rgba(0, 0, 0, 0.22);
+    border-bottom: 1px solid var(--obs-line);
   }
+  .obs-traffic { display: flex; gap: 5px; flex: none; }
   .obs-traffic i {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
+    width: 8px; height: 8px; border-radius: 50%;
     background: rgba(236, 226, 207, 0.22);
   }
   .obs-traffic i:nth-child(1) { background: #c97b7b; }
   .obs-traffic i:nth-child(2) { background: #c9b07a; }
   .obs-traffic i:nth-child(3) { background: #8faf8a; }
-  .obs-crumb {
+  .obs-appname {
     flex: 1;
-    min-width: 0;
+    text-align: center;
     font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.04em;
-    color: var(--fg-dim);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    letter-spacing: 0.06em;
+    color: var(--obs-muted);
   }
-  .obs-crumb span { color: var(--fg-faint); margin: 0 4px; }
-  .obs-crumb b { color: var(--fg); font-weight: 500; }
-  .obs-live {
+  .obs-menubar {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 10px;
+    height: 36px;
+    padding: 0 10px;
+    flex: none;
+    border-bottom: 1px solid var(--obs-line);
+    background: rgba(0, 0, 0, 0.1);
+  }
+  .obs-logo-mark {
+    width: 22px; height: 22px; flex: none;
+    border-radius: 5px;
+    background: rgba(182, 165, 198, 0.22);
+    color: var(--obs-ink);
+    display: grid; place-items: center;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+  }
+  .obs-seg {
+    display: inline-flex;
+    align-items: stretch;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid var(--obs-line);
+    border-radius: 7px;
+    overflow: hidden;
+    height: 26px;
+  }
+  .obs-seg button {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    color: var(--obs-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.02em;
+    padding: 0 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+  }
+  .obs-seg button[aria-selected="true"] {
+    background: rgba(236, 226, 207, 0.12);
+    color: var(--obs-ink);
+  }
+  .obs-seg button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+  }
+  .obs-seg-ico {
+    width: 10px; height: 10px; border-radius: 2px;
+    background: currentColor; opacity: 0.55;
+  }
+  .obs-shell {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+  .obs-rail {
+    border-right: 1px solid var(--obs-line);
+    background: rgba(0, 0, 0, 0.16);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+  }
+  .obs-rail span {
+    width: 28px; height: 28px;
+    border-radius: 7px;
+    background: rgba(236, 226, 207, 0.06);
+    display: grid; place-items: center;
+    color: var(--obs-faint);
+  }
+  .obs-rail span.is-active {
+    background: rgba(182, 165, 198, 0.22);
+    color: var(--obs-ink);
+  }
+  .obs-rail svg { width: 14px; height: 14px; display: block; }
+  .obs-rail-spacer { flex: 1; }
+  .obs-views {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+  }
+  .obs-view {
+    position: absolute;
+    inset: 0;
+    display: none;
+    min-height: 0;
+  }
+  .obs[data-mode="standby"] .obs-view--standby { display: grid; }
+  .obs[data-mode="observe"] .obs-view--observe { display: grid; }
+
+  /* —— Standby —— */
+  .obs-view--standby,
+  .obs-view--observe {
+    grid-template-columns: minmax(0, 1fr) 240px;
+  }
+  .obs-standby-main {
+    min-width: 0;
+    min-height: 0;
+    padding: 16px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+  }
+  .obs-ep-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex: none;
+  }
+  .obs-ep-name {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    color: var(--obs-ink);
+  }
+  .obs-ep-status {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-variant-numeric: tabular-nums;
+  }
+  .obs-standby-label {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    letter-spacing: 0.08em;
+    color: var(--obs-good);
+    font-weight: 500;
+  }
+  .obs-standby-label::before {
+    content: "• ";
+  }
+  .obs-standby-clock {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    color: var(--obs-ink);
+    font-weight: 500;
+  }
+  .obs-dash {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(180px, 0.85fr);
+    gap: 12px;
+  }
+  .obs-dash-left {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .obs-vision {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--obs-line);
+    background: #141218;
+  }
+  .obs-vision video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .obs-vision-tag {
+    position: absolute;
+    left: 10px; top: 10px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--obs-ink);
+    background: rgba(20, 18, 24, 0.65);
+    padding: 3px 6px;
+    border-radius: 3px;
+  }
+  .obs-rows {
+    flex: none;
     font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 0.08em;
-    color: var(--fg);
-    font-variant-numeric: tabular-nums;
+    color: var(--obs-muted);
+  }
+  .obs-meters {
     flex: none;
+    display: grid;
+    gap: 7px;
   }
-  .obs-dot {
-    width: 6px;
+  .obs-meter {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    color: var(--obs-muted);
+  }
+  .obs-meter b { color: var(--obs-ink); font-weight: 500; }
+  .obs-meter-track {
     height: 6px;
-    border-radius: 50%;
-    background: #e08a94;
-    box-shadow: 0 0 0 0 rgba(224, 138, 148, 0.45);
-    animation: obsPulse 2s ease-in-out infinite;
+    border-radius: 999px;
+    background: rgba(236, 226, 207, 0.08);
+    overflow: hidden;
   }
-  @keyframes obsPulse {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(224, 138, 148, 0.4); }
-    50% { opacity: 0.55; box-shadow: 0 0 0 5px rgba(224, 138, 148, 0); }
-  }
-  .obs-body {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 118px;
-    height: 340px;
-    min-height: 340px;
-    max-height: 340px;
-  }
-  .obs-wall {
-    position: relative;
-    display: grid;
-    gap: 5px;
-    padding: 8px;
+  .obs-meter-fill {
     height: 100%;
+    border-radius: inherit;
+    background: var(--obs-good);
+  }
+  .obs-meter-fill.is-cpu { background: var(--obs-teal); width: 42%; }
+  .obs-meter-fill.is-ram { background: #9bb89a; width: 61%; }
+  .obs-meter-fill.is-gpu { background: #6f93b0; width: 78%; }
+  .obs-meter-fill.is-storage { width: 72%; }
+  .obs-sensors {
+    min-height: 0;
+    border: 1px solid var(--obs-line);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.16);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    overflow: hidden;
+  }
+  .obs-sensors-head {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--obs-muted);
+    margin-bottom: 4px;
+  }
+  .obs-sensors-head b { color: var(--obs-good); font-weight: 500; }
+  .obs-sensor {
+    display: grid;
+    grid-template-columns: 8px 1fr auto;
+    gap: 8px;
+    align-items: center;
+    padding: 6px 8px;
+    border-radius: 6px;
+    background: rgba(236, 226, 207, 0.04);
+    border: 1px solid rgba(236, 226, 207, 0.06);
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+  .obs-sensor i {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--obs-good);
+  }
+  .obs-sensor.is-bad i { background: var(--obs-warn); }
+  .obs-sensor.is-off i { background: var(--obs-faint); }
+  .obs-sensor span { color: var(--obs-ink); }
+  .obs-sensor em {
+    font-style: normal;
+    color: var(--obs-muted);
+    letter-spacing: 0.06em;
+  }
+  .obs-sensor.is-bad em { color: var(--obs-warn); }
+  .obs-sensor.is-off em { color: var(--obs-faint); }
+
+  .obs-details,
+  .obs-observe-side {
+    border-left: 1px solid var(--obs-line);
+    background: rgba(0, 0, 0, 0.18);
+    padding: 12px 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
     min-height: 0;
     overflow: hidden;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .obs-record,
+  .obs-start {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    width: 100%;
+    height: 40px;
+    padding: 0 18px;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: none;
+  }
+  .obs-record {
+    background: var(--obs-good);
+    color: #243028;
+  }
+  .obs-record:hover { filter: brightness(1.05); }
+  .obs-record:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .obs-record-ico {
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 6px 0 6px 10px;
+    border-color: transparent transparent transparent currentColor;
+  }
+  .obs-details-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--obs-faint);
+  }
+  .obs-field { display: grid; gap: 5px; }
+  .obs-field label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--obs-muted);
+  }
+  .obs-field-row { display: grid; grid-template-columns: 1fr auto; gap: 6px; }
+  .obs-field input,
+  .obs-field select,
+  .obs-field textarea {
+    width: 100%;
+    border: 1px solid var(--obs-line);
+    background: rgba(0, 0, 0, 0.28);
+    color: var(--obs-ink);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-family: var(--font-sans);
+    font-size: 12px;
+  }
+  .obs-field textarea { min-height: 52px; resize: none; }
+  .obs-sync {
+    appearance: none;
+    border: 0;
+    border-radius: 6px;
+    padding: 0 12px;
+    background: var(--obs-teal);
+    color: #132028;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: default;
+  }
+  .obs-toggle {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .obs-toggle > span:first-child {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--obs-muted);
+  }
+  .obs-toggle:has(input:checked) > span:first-child { color: var(--obs-ink); }
+  .obs-toggle input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .obs-switch {
+    position: relative;
+    width: 30px; height: 17px;
+    border-radius: 999px;
+    background: rgba(236, 226, 207, 0.14);
+    transition: background 0.18s ease;
+    flex: none;
+  }
+  .obs-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: rgba(236, 226, 207, 0.7);
+    transition: transform 0.18s ease, background 0.18s ease;
+  }
+  .obs-toggle input:checked + .obs-switch {
+    background: rgba(182, 165, 198, 0.55);
+  }
+  .obs-toggle input:checked + .obs-switch::after {
+    transform: translateX(13px);
+    background: #ECE2CF;
+  }
+  .obs-toggle input:focus-visible + .obs-switch {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .obs-storage-foot {
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: var(--obs-faint);
+  }
+
+  /* —— Observe —— */
+  .obs-observe-main {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 10px 10px 12px;
+    gap: 8px;
+  }
+  .obs-crumb {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+    color: var(--obs-muted);
+  }
+  .obs-crumb span { color: var(--obs-faint); margin: 0 4px; }
+  .obs-crumb b { color: var(--obs-ink); font-weight: 500; }
+  .obs-wall {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    gap: 5px;
+    overflow: hidden;
     background: #1c1921;
+    border-radius: 6px;
+    border: 1px solid var(--obs-line);
+    padding: 6px;
   }
   .obs-pane {
     position: relative;
@@ -1059,14 +1447,13 @@
   .obs-pane canvas { object-fit: fill; }
   .obs-tag {
     position: absolute;
-    top: 6px;
-    left: 7px;
+    top: 6px; left: 7px;
     z-index: 2;
     font-family: var(--font-mono);
     font-size: 8px;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--fg);
+    color: var(--obs-ink);
     background: rgba(20, 18, 24, 0.62);
     padding: 2px 5px;
     border-radius: 2px;
@@ -1075,44 +1462,179 @@
     pointer-events: none;
   }
   .obs-pane--head { grid-area: head; }
-  .obs-pane--accel { grid-area: accel; }
-  .obs-pane--gyro { grid-area: gyro; }
   .obs-pane--depth { grid-area: depth; }
+  .obs-pane--hfps { grid-area: hfps; }
+  .obs-pane--wlfps { grid-area: wlfps; }
+  .obs-pane--wrfps { grid-area: wrfps; }
   .obs-pane--wl { grid-area: wl; }
   .obs-pane--wr { grid-area: wr; }
-  .obs-pane--hand { grid-area: hand; }
-
-  /* Layout presets — auto-reflow when streams toggle */
+  .obs-pane--glove { grid-area: glove; }
+  .obs-pane--tact { grid-area: tact; }
+  .obs-glove {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: 6px;
+    width: 100%;
+    height: 100%;
+    padding: 22px 8px 8px;
+    box-sizing: border-box;
+    background: #141218;
+  }
+  .obs-glove-viz {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 3px;
+    background: #1a1720;
+    overflow: hidden;
+  }
+  .obs-glove-viz canvas {
+    width: 100%;
+    height: 100%;
+  }
+  .obs-glove-ch {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 2px 2px 0;
+  }
+  .obs-glove-ch .ch {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2px 6px;
+    align-items: center;
+  }
+  .obs-glove-ch .ch .label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(236, 226, 207, 0.55);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .obs-glove-ch .ch .swatch {
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    flex: 0 0 auto;
+  }
+  .obs-glove-ch .ch .val {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--obs-ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .obs-glove-ch .ch .track {
+    grid-column: 1 / -1;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(236, 226, 207, 0.08);
+    overflow: hidden;
+  }
+  .obs-glove-ch .ch .bar {
+    height: 100%;
+    width: 0%;
+    border-radius: 2px;
+  }
+  .obs-glove-ch .ch.dead { opacity: 0.45; }
+  .obs-glove-ch .grasp {
+    margin-top: auto;
+    padding: 6px 7px;
+    border-radius: 3px;
+    border: 1px solid rgba(236, 226, 207, 0.08);
+    background: rgba(26, 23, 32, 0.9);
+  }
+  .obs-glove-ch .grasp .k {
+    font-family: var(--font-mono);
+    font-size: 7px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(236, 226, 207, 0.4);
+  }
+  .obs-glove-ch .grasp .row {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-top: 2px;
+  }
+  .obs-glove-ch .grasp .v {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--obs-ink);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .obs-glove-ch .grasp .tag {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(236, 226, 207, 0.45);
+  }
+  .obs-pane-live {
+    position: absolute;
+    top: 6px; right: 7px;
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    color: var(--obs-good);
+  }
+  .obs-pane-val {
+    position: absolute;
+    top: 6px; right: 7px;
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.04em;
+    color: var(--obs-ink);
+    font-variant-numeric: tabular-nums;
+  }
   .obs[data-layout="CDS"] .obs-wall {
-    grid-template-columns: 2.1fr 1fr 1.55fr;
-    grid-template-rows: 1fr 1fr 1.05fr;
+    grid-template-columns: 1.35fr 1.35fr 1fr 1fr;
+    grid-template-rows: 1.45fr 0.95fr 1.2fr;
     grid-template-areas:
-      "head accel depth"
-      "head gyro  depth"
-      "wl   wr    hand";
+      "head head depth hfps"
+      "wlfps wrfps wl wr"
+      "glove glove tact tact";
   }
   .obs[data-layout="CD"] .obs-wall {
-    grid-template-columns: 1.3fr 1fr 1fr;
+    grid-template-columns: 1.4fr 1.4fr 1.2fr;
     grid-template-rows: 1.55fr 1fr;
     grid-template-areas:
       "head head depth"
       "wl   wr   depth";
   }
   .obs[data-layout="CS"] .obs-wall {
-    grid-template-columns: 2fr 1fr 1.2fr;
-    grid-template-rows: 1fr 1fr 1.05fr;
+    grid-template-columns: 1.4fr 1.4fr 1fr 1fr;
+    grid-template-rows: 1.35fr 0.95fr 1.2fr;
     grid-template-areas:
-      "head accel hand"
-      "head gyro  hand"
-      "wl   wr    hand";
+      "head head hfps hfps"
+      "wlfps wrfps wl wr"
+      "glove glove tact tact";
   }
   .obs[data-layout="DS"] .obs-wall {
-    grid-template-columns: 1fr 1.35fr;
-    grid-template-rows: 1fr 1fr 1.15fr;
+    grid-template-columns: 1.35fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1.25fr;
     grid-template-areas:
-      "accel depth"
-      "gyro  depth"
-      "hand  hand";
+      "depth hfps wlfps wrfps"
+      "glove glove tact tact";
+    align-content: start;
+  }
+  .obs[data-layout="DS"] .obs-pane--hfps,
+  .obs[data-layout="DS"] .obs-pane--wlfps,
+  .obs[data-layout="DS"] .obs-pane--wrfps {
+    align-self: start;
+    min-height: 88px;
+    max-height: 120px;
   }
   .obs[data-layout="C"] .obs-wall {
     grid-template-columns: 2fr 1fr 1fr;
@@ -1128,10 +1650,11 @@
   }
   .obs[data-layout="S"] .obs-wall {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1.2fr;
+    grid-template-rows: 1fr 1fr 1.25fr;
     grid-template-areas:
-      "accel gyro"
-      "hand  hand";
+      "hfps hfps"
+      "wlfps wrfps"
+      "glove tact";
   }
   .obs[data-layout="none"] .obs-wall {
     grid-template-columns: 1fr;
@@ -1146,92 +1669,51 @@
     font-family: var(--font-mono);
     font-size: 11px;
     letter-spacing: 0.06em;
-    color: var(--fg-dim);
+    color: var(--obs-muted);
     text-align: center;
     grid-area: empty;
   }
   .obs[data-layout="none"] .obs-empty { display: flex; }
-
-  .obs-side {
-    border-left: 1px solid rgba(236, 226, 207, 0.08);
-    background: rgba(0, 0, 0, 0.16);
-    padding: 14px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-height: 0;
-    overflow: hidden;
+  .obs-start {
+    background: var(--obs-warn);
+    color: #2a1418;
   }
+  .obs-start:hover { filter: brightness(1.05); }
+  .obs-start:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .obs-start-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: currentColor;
+    animation: obsPulse 2s ease-in-out infinite;
+  }
+  @keyframes obsPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.45; }
+  }
+  .obs-rec-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--obs-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .obs-rec-meta strong { color: var(--obs-warn); font-weight: 500; }
   .obs-side-label {
     font-family: var(--font-mono);
     font-size: 9px;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--fg-faint);
-    margin-bottom: 10px;
-  }
-  .obs-toggle {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: 8px;
-    padding: 9px 0;
-    border-bottom: 1px solid rgba(236, 226, 207, 0.06);
-    cursor: pointer;
-    user-select: none;
-  }
-  .obs-toggle:last-of-type { border-bottom: none; }
-  .obs-toggle span:first-child {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.02em;
-    color: var(--fg-dim);
-  }
-  .obs-toggle:has(input:checked) span:first-child { color: var(--fg); }
-  .obs-toggle input {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .obs-switch {
-    position: relative;
-    width: 30px;
-    height: 17px;
-    border-radius: 999px;
-    background: rgba(236, 226, 207, 0.14);
-    transition: background 0.18s ease;
-    flex: none;
-  }
-  .obs-switch::after {
-    content: "";
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background: rgba(236, 226, 207, 0.7);
-    transition: transform 0.18s ease, background 0.18s ease;
-  }
-  .obs-toggle input:checked + .obs-switch {
-    background: rgba(182, 165, 198, 0.55);
-  }
-  .obs-toggle input:checked + .obs-switch::after {
-    transform: translateX(13px);
-    background: #ECE2CF;
-  }
-  .obs-toggle input:focus-visible + .obs-switch {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
+    color: var(--obs-faint);
+    margin-top: 6px;
   }
   .obs-side-note {
     margin-top: auto;
-    padding-top: 16px;
     font-family: var(--font-mono);
     font-size: 9px;
     line-height: 1.45;
-    letter-spacing: 0.04em;
-    color: var(--fg-faint);
+    color: var(--obs-faint);
   }
 
   /* ———— WORKSPACE / COMMUNITY ———— */
@@ -1367,7 +1849,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .reveal, .reveal-fade { opacity: 1; transform: none; transition: none; }
-    .obs-dot { animation: none !important; box-shadow: none; }
+    .obs-start-dot { animation: none !important; }
     .mod-card { transition: none !important; }
     .viz-cam-head .viz-cam-feed,
     .viz-skel,
@@ -1475,10 +1957,8 @@
     .statement-inner { max-width: none; }
     .mod-deck { min-height: 480px; }
     .mod-stage { height: 480px; }
-    .hood-inner {
-      grid-template-columns: 1fr;
-      gap: 40px;
-    }
+    .hood-inner { gap: 36px; }
+    .obs { height: 680px; }
   }
   @media (max-width: 820px) {
     .page { padding: 20px 24px; }
@@ -1500,17 +1980,13 @@
     }
     .how h2 { max-width: none; }
     .hood { padding: 72px 24px; }
-    .hood-inner {
-      grid-template-columns: 1fr;
-      gap: 40px;
-    }
+    .hood-inner { gap: 32px; }
     .hood h2 { max-width: none; }
-    .obs-body {
-      grid-template-columns: minmax(0, 1fr) 108px;
-      height: 300px;
-      min-height: 300px;
-      max-height: 300px;
-    }
+    .obs { height: 640px; }
+    .obs-view--standby,
+    .obs-view--observe { grid-template-columns: minmax(0, 1fr) 200px; }
+    .obs-standby-clock { font-size: 22px; }
+    .obs-standby-label { font-size: 14px; }
     footer { padding: 64px 24px 24px; }
     .meta-strip { grid-template-columns: repeat(2, 1fr); gap: 20px; }
     .footer-inner { grid-template-columns: 1fr; gap: 32px; }
@@ -1522,57 +1998,34 @@
     .cowork { padding: 80px 24px 48px; }
     .cw-cols { grid-template-columns: 1fr; gap: 40px; margin-top: 40px; padding-top: 32px; }
   }
-  @media (max-width: 440px) {
-    .obs-body {
+  @media (max-width: 720px) {
+    .obs { height: 760px; }
+    .obs-shell { grid-template-columns: 1fr; }
+    .obs-rail { display: none; }
+    .obs-view--standby,
+    .obs-view--observe {
       grid-template-columns: 1fr;
-      grid-template-rows: 260px auto;
-      height: auto;
-      min-height: 0;
-      max-height: none;
+      grid-template-rows: minmax(0, 1fr) auto;
     }
-    .obs-wall {
-      height: 260px;
-      min-height: 260px;
-      max-height: 260px;
-    }
-    .obs-side {
+    .obs-details,
+    .obs-observe-side {
       border-left: none;
-      border-top: 1px solid rgba(236, 226, 207, 0.08);
-      flex-direction: row;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 4px 16px;
-      padding: 12px 14px;
-      overflow: visible;
+      border-top: 1px solid var(--obs-line);
     }
-    .obs-side-label { width: 100%; margin-bottom: 2px; }
-    .obs-toggle { border-bottom: none; padding: 6px 0; }
-    .obs-side-note { display: none; }
-    .obs[data-layout="CDS"] .obs-wall {
-      grid-template-columns: 1.4fr 1fr;
-      grid-template-rows: 1.1fr 0.7fr 0.7fr 0.9fr;
-      grid-template-areas:
-        "head depth"
-        "accel gyro"
-        "wl wr"
-        "hand hand";
-    }
+    .obs-dash { grid-template-columns: 1fr; }
+    .obs-seg button { padding: 0 10px; }
+    .obs[data-layout="CDS"] .obs-wall,
     .obs[data-layout="CS"] .obs-wall {
       grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1.1fr 0.7fr 0.7fr 0.9fr;
-      grid-template-areas:
-        "head head"
-        "accel gyro"
-        "wl wr"
-        "hand hand";
-    }
-    .obs[data-layout="CD"] .obs-wall {
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1.4fr 0.9fr;
+      grid-template-rows: 1.15fr 0.75fr 0.8fr 0.85fr 1.1fr;
       grid-template-areas:
         "head depth"
-        "wl wr";
+        "hfps hfps"
+        "wl wr"
+        "wlfps wrfps"
+        "glove tact";
     }
+    .obs-side-note { display: none; }
   }
 </style>
 </head>
@@ -1820,102 +2273,225 @@
 <section class="hood" id="under-the-hood">
   <div class="hood-inner">
     <div class="hood-copy">
-      <div class="hood-label reveal">Under the hood · Coming soon</div>
+      <div class="hood-label reveal">Under the hood</div>
       <h2 class="reveal">Check out the tool <em>behind our data.</em></h2>
       <p class="hood-lead reveal">
-        The ground truth doesn't collect itself. We built the tool to capture it: an open-source macOS app our operators use to set up robots and record episodes in the field. Good data starts with the way it's captured.
+        Good data starts with the way it's captured. We built the tool to do that in-house: here's a preview of the custom IOS app our operators use to set up robots and record episodes in the field.
       </p>
-      <p class="hood-kicker reveal">Built in-house. Open to all.</p>
-      <div class="hood-cta reveal">
-        <!-- Auto-tracks the newest fm-desktop release. `latest/download/First-Motive.dmg`
-             is a stable, version-less asset uploaded to every release (by release.sh,
-             alongside the versioned First-Motive-<v>.dmg), so this link never goes stale
-             as versions bump — no per-release edit here.
-             CAVEAT: fm-desktop is a PRIVATE repo, so this resolves only for visitors
-             logged into GitHub with first-motive org access (the intended internal
-             audience). Anonymous visitors get GitHub's 404/login, not a download. -->
-        <a class="btn" href="https://github.com/first-motive/fm-desktop/releases/latest/download/First-Motive.dmg">
-          Download for macOS
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M7 2v7M4 6l3 3 3-3M2.5 11.5h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" stroke-linejoin="round"/>
-          </svg>
-        </a>
-        <a class="btn btn-secondary" href="mailto:adii@firstmotive.ai?subject=Request%20early%20access">
-          Request early access
-        </a>
-      </div>
     </div>
 
     <div
       class="obs reveal-fade"
       id="obsPanel"
+      data-mode="observe"
       data-cameras="on"
       data-depth="on"
       data-signals="on"
       data-layout="CDS"
       role="region"
-      aria-label="Observe preview. Toggle cameras, depth, and signal streams."
+      aria-label="First Motive capture app preview"
     >
       <div class="obs-titlebar">
         <div class="obs-traffic" aria-hidden="true"><i></i><i></i><i></i></div>
-        <div class="obs-crumb">Home <span>/</span> Record <span>/</span> <b>Observe</b></div>
-        <div class="obs-live"><span class="obs-dot"></span> REC <span id="obsTimer">00:00</span></div>
+        <div class="obs-appname">First Motive</div>
       </div>
 
-      <div class="obs-body">
-        <div class="obs-wall" id="obsWall">
-          <div class="obs-pane obs-pane--head" data-stream="cameras">
-            <video src="assets/showcase/head.mp4" muted loop playsinline autoplay preload="auto"></video>
-            <span class="obs-tag">Head RGB</span>
-          </div>
-          <div class="obs-pane obs-pane--accel" data-stream="signals">
-            <canvas id="obsAccel"></canvas>
-            <span class="obs-tag">Head IMU · Accel</span>
-          </div>
-          <div class="obs-pane obs-pane--gyro" data-stream="signals">
-            <canvas id="obsGyro"></canvas>
-            <span class="obs-tag">Head IMU · Gyro</span>
-          </div>
-          <div class="obs-pane obs-pane--depth" data-stream="depth">
-            <video src="assets/showcase/head_depth.mp4" muted loop playsinline autoplay preload="auto"></video>
-            <span class="obs-tag">Head Depth</span>
-          </div>
-          <div class="obs-pane obs-pane--wl" data-stream="cameras">
-            <video src="assets/showcase/wrist_left.mp4" muted loop playsinline autoplay preload="auto"></video>
-            <span class="obs-tag">Left Wrist</span>
-          </div>
-          <div class="obs-pane obs-pane--wr" data-stream="cameras">
-            <video src="assets/showcase/wrist_right.mp4" muted loop playsinline autoplay preload="auto"></video>
-            <span class="obs-tag">Right Wrist</span>
-          </div>
-          <div class="obs-pane obs-pane--hand" data-stream="signals">
-            <canvas id="obsHand"></canvas>
-            <span class="obs-tag">Hand · Grip / Flex</span>
-          </div>
-          <div class="obs-empty" hidden>Turn on a stream to observe the episode.</div>
+      <div class="obs-menubar">
+        <div class="obs-logo-mark" aria-hidden="true">FM</div>
+        <div class="obs-seg" role="tablist" aria-label="Episode views">
+          <button type="button" role="tab" data-obs-mode="standby" aria-selected="false">
+            <span class="obs-seg-ico" aria-hidden="true"></span>
+            Overview
+          </button>
+          <button type="button" role="tab" data-obs-mode="observe" aria-selected="true">
+            <span class="obs-seg-ico" aria-hidden="true"></span>
+            Detailed view
+          </button>
         </div>
+      </div>
 
-        <aside class="obs-side">
-          <div class="obs-side-label">Streams</div>
-          <label class="obs-toggle">
-            <span>Cameras</span>
-            <input type="checkbox" checked data-obs-toggle="cameras" />
-            <span class="obs-switch" aria-hidden="true"></span>
-          </label>
-          <label class="obs-toggle">
-            <span>Depth</span>
-            <input type="checkbox" checked data-obs-toggle="depth" />
-            <span class="obs-switch" aria-hidden="true"></span>
-          </label>
-          <label class="obs-toggle">
-            <span>Signals</span>
-            <input type="checkbox" checked data-obs-toggle="signals" />
-            <span class="obs-switch" aria-hidden="true"></span>
-          </label>
-          <p class="obs-side-note">Toggle streams to reflow the wall.</p>
-        </aside>
+      <div class="obs-shell">
+        <nav class="obs-rail" aria-hidden="true">
+          <span class="is-active">
+            <svg viewBox="0 0 14 14" fill="none"><rect x="2" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="2" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="8" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/><rect x="8" y="8" width="4" height="4" rx="1" stroke="currentColor" stroke-width="1.2"/></svg>
+          </span>
+          <span>
+            <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4.5v2.7l1.6 1.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          <span>
+            <svg viewBox="0 0 14 14" fill="none"><path d="M3 4.5h8M3 7h8M3 9.5h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+          <span>
+            <svg viewBox="0 0 14 14" fill="none"><path d="M3 11V5.5L7 3l4 2.5V11H3z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          </span>
+          <div class="obs-rail-spacer"></div>
+          <span>
+            <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.2" stroke="currentColor" stroke-width="1.2"/><path d="M3.2 11c.7-2 2-3 3.8-3s3.1 1 3.8 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </span>
+        </nav>
+
+        <div class="obs-views">
+          <!-- Standby / Overview -->
+          <div class="obs-view obs-view--standby">
+            <div class="obs-standby-main">
+              <div class="obs-ep-head">
+                <div class="obs-ep-name">Episode 2026-07-24_162233_franka</div>
+                <div class="obs-ep-status">
+                  <span class="obs-standby-label">STANDBY</span>
+                  <span class="obs-standby-clock" id="obsStandbyClock">00:12.4</span>
+                </div>
+              </div>
+
+              <div class="obs-dash">
+                <div class="obs-dash-left">
+                  <div class="obs-vision">
+                    <video src="assets/showcase/head.mp4" muted loop playsinline preload="auto" id="obsStandbyVideo"></video>
+                    <div class="obs-vision-tag">Vision · Live</div>
+                  </div>
+                  <div class="obs-rows">1,240 rows · 0 dropped</div>
+                  <div class="obs-meters">
+                    <div class="obs-meter"><span>Storage</span><div class="obs-meter-track"><div class="obs-meter-fill is-storage"></div></div><b>128 GB · OK</b></div>
+                    <div class="obs-meter"><span>CPU</span><div class="obs-meter-track"><div class="obs-meter-fill is-cpu"></div></div><b>42%</b></div>
+                    <div class="obs-meter"><span>RAM</span><div class="obs-meter-track"><div class="obs-meter-fill is-ram"></div></div><b>19.5 / 32 GB</b></div>
+                    <div class="obs-meter"><span>GPU</span><div class="obs-meter-track"><div class="obs-meter-fill is-gpu"></div></div><b>78%</b></div>
+                  </div>
+                </div>
+
+                <div class="obs-sensors">
+                  <div class="obs-sensors-head"><span>Sensors</span><b>5 / 6 live</b></div>
+                  <div class="obs-sensor"><i></i><span>Head RGB</span><em>30 Hz</em></div>
+                  <div class="obs-sensor"><i></i><span>Head Depth</span><em>Live</em></div>
+                  <div class="obs-sensor"><i></i><span>Head IMU</span><em>200 Hz</em></div>
+                  <div class="obs-sensor"><i></i><span>Left Wrist</span><em>Live</em></div>
+                  <div class="obs-sensor"><i></i><span>Right Wrist</span><em>Live</em></div>
+                  <div class="obs-sensor is-off"><i></i><span>Base Cam</span><em>Off</em></div>
+                </div>
+              </div>
+            </div>
+
+            <aside class="obs-details">
+              <button type="button" class="obs-record" id="obsRecordBtn">
+                <span class="obs-record-ico" aria-hidden="true"></span>
+                Record
+              </button>
+              <div class="obs-details-label">Episode details</div>
+              <div class="obs-field">
+                <label for="obsOperator">Operator</label>
+                <div class="obs-field-row">
+                  <select id="obsOperator" tabindex="-1">
+                    <option>Wynand</option>
+                    <option>Adii</option>
+                  </select>
+                  <button type="button" class="obs-sync" tabindex="-1">Sync</button>
+                </div>
+              </div>
+              <div class="obs-field">
+                <label for="obsProject">Project</label>
+                <select id="obsProject" tabindex="-1">
+                  <option>Pick and place</option>
+                  <option>Assembly</option>
+                </select>
+              </div>
+              <div class="obs-field">
+                <label for="obsTask">Task</label>
+                <input id="obsTask" type="text" value="Pick red block" tabindex="-1" readonly />
+              </div>
+              <div class="obs-field">
+                <label for="obsInstruction">Instruction</label>
+                <textarea id="obsInstruction" tabindex="-1" readonly>Pick the red block, place in bin</textarea>
+              </div>
+              <div class="obs-storage-foot">Storage 128 GB · OK</div>
+            </aside>
+          </div>
+
+          <!-- Observe / recording wall -->
+          <div class="obs-view obs-view--observe">
+            <div class="obs-observe-main">
+              <div class="obs-crumb">Home <span>/</span> Record <span>/</span> <b>Observe</b> <span>/</span> By device</div>
+              <div class="obs-wall" id="obsWall">
+                <div class="obs-pane obs-pane--head" data-stream="cameras">
+                  <video src="assets/showcase/head.mp4" muted loop playsinline preload="auto"></video>
+                  <span class="obs-tag">Head RGB</span>
+                  <span class="obs-pane-live">30 Hz · Live</span>
+                </div>
+                <div class="obs-pane obs-pane--depth" data-stream="depth">
+                  <video src="assets/showcase/head_depth.mp4" muted loop playsinline preload="auto"></video>
+                  <span class="obs-tag">Head Depth</span>
+                </div>
+                <div class="obs-pane obs-pane--hfps" data-stream="signals">
+                  <canvas id="obsHeadFps"></canvas>
+                  <span class="obs-tag">Head Cam · Fps</span>
+                  <span class="obs-pane-val" id="obsHeadFpsVal">30.0</span>
+                </div>
+                <div class="obs-pane obs-pane--wlfps" data-stream="signals">
+                  <canvas id="obsWristLFps"></canvas>
+                  <span class="obs-tag">Wrist L · Fps</span>
+                  <span class="obs-pane-val" id="obsWristLFpsVal">30.0</span>
+                </div>
+                <div class="obs-pane obs-pane--wrfps" data-stream="signals">
+                  <canvas id="obsWristRFps"></canvas>
+                  <span class="obs-tag">Wrist R · Fps</span>
+                  <span class="obs-pane-val" id="obsWristRFpsVal">29.8</span>
+                </div>
+                <div class="obs-pane obs-pane--wl" data-stream="cameras">
+                  <video src="assets/showcase/wrist_left.mp4" muted loop playsinline preload="auto"></video>
+                  <span class="obs-tag">Left Wrist</span>
+                  <span class="obs-pane-live">Live</span>
+                </div>
+                <div class="obs-pane obs-pane--wr" data-stream="cameras">
+                  <video src="assets/showcase/wrist_right.mp4" muted loop playsinline preload="auto"></video>
+                  <span class="obs-tag">Right Wrist</span>
+                  <span class="obs-pane-live">Live</span>
+                </div>
+                <div class="obs-pane obs-pane--glove" data-stream="signals">
+                  <div class="obs-glove">
+                    <div class="obs-glove-viz">
+                      <canvas id="obsGloveViz"></canvas>
+                    </div>
+                    <div class="obs-glove-ch" id="obsGloveCh"></div>
+                  </div>
+                  <span class="obs-tag">Glove · Tactile</span>
+                </div>
+                <div class="obs-pane obs-pane--tact" data-stream="signals">
+                  <canvas id="obsTactile"></canvas>
+                  <span class="obs-tag">Glove · Channels</span>
+                </div>
+                <div class="obs-empty" hidden>Turn on a stream to observe the episode.</div>
+              </div>
+            </div>
+
+            <aside class="obs-observe-side">
+              <button type="button" class="obs-start" id="obsStopBtn">
+                <span class="obs-start-dot" aria-hidden="true"></span>
+                Stop
+              </button>
+              <div class="obs-rec-meta">
+                <strong>REC</strong>
+                <span id="obsTimer">00:00</span>
+              </div>
+              <div class="obs-side-label">Streams</div>
+              <label class="obs-toggle">
+                <span>Cameras</span>
+                <input type="checkbox" checked data-obs-toggle="cameras" />
+                <span class="obs-switch" aria-hidden="true"></span>
+              </label>
+              <label class="obs-toggle">
+                <span>Depth</span>
+                <input type="checkbox" checked data-obs-toggle="depth" />
+                <span class="obs-switch" aria-hidden="true"></span>
+              </label>
+              <label class="obs-toggle">
+                <span>Signals</span>
+                <input type="checkbox" checked data-obs-toggle="signals" />
+                <span class="obs-switch" aria-hidden="true"></span>
+              </label>
+              <p class="obs-side-note">Toggle streams to reflow the wall.</p>
+            </aside>
+          </div>
+        </div>
       </div>
     </div>
+
   </div>
 </section>
 
