@@ -1,22 +1,22 @@
-# First Motive — Real-world training data for robots that manipulate.
+# First Motive — Ground-truth infrastructure for Physical AI
 
-> We design and run task-specific data collection for robotics and Physical AI teams: egocentric vision, depth, motion, and tactile signals, synchronized and packaged with the evidence needed to use them responsibly.
+> The data engine that turns off-the-shelf robots into deployment-grade workers. Anyone can inspect our data and measure their own robot against the same benchmark. Built from South Africa.
 
 | Fact | Value |
 | --- | --- |
 | Company | First Motive |
-| What | Real-world training data for robots that manipulate. |
-| Engagement | Custom data pilots |
+| What | Ground-truth infrastructure for Physical AI |
+| Status | First pilot project in flight |
 | Based | Stellenbosch, ZA |
-| Data format | Multi-modal robot training data |
+| Data format | Multi-modal, RLDS compatible data capturing |
 | Contact | adii@firstmotive.ai |
 | Site | https://firstmotive.ai |
 
 ## What we do
 
-Custom robot training data for real tasks.
+Every AI breakthrough has been a data story. Physical AI has no data.
 
-Open datasets rarely match a team's task, environment, embodiment, sensor stack, or permitted use. We collect human demonstrations and robot episodes for the use case at hand, then keep the source, quality evidence, and derived data traceable through delivery.
+Robots learn from recordings of real tasks — every reach, grip, and slip. That data doesn't exist yet, so we're creating it by capturing real-world tasks and structuring it into reusable training data.
 
 ### Capture modalities
 
@@ -64,89 +64,19 @@ Sensors: Glove Tactile · Sample rate: 40 Hz
 
 **We record the recording.**
 
-Stream coverage, frame rate, sync evidence, and dropped samples are recorded alongside each episode, so quality problems can be found, explained, and dispositioned.
-
-## Robot data services
-
-From a data brief to an inspectable dataset.
-
-We start with the model, evaluation, or deployment decision the data must support. That keeps collection, quality work, annotation, and packaging tied to a real downstream use.
-
-### 1. Custom multimodal data collection
-
-We define the task and capture setup, then record human demonstrations or robot episodes in the relevant environment. Vision, depth, motion, and tactile signals are selected because the use case needs them, not to inflate a modality count.
-
-### 2. Dataset processing and quality validation
-
-Raw source stays identifiable while streams are inventoried, aligned, and normalized. Quality checks record missingness, timing, coverage, and disposition so a team can see what passed, what changed, and what remains uncertain.
-
-### 3. Annotation, review, and delivery
-
-Annotations and review decisions stay linked to exact source inputs. Delivery packages can include provenance, rights and use metadata, verification steps, and a consumer-specific projection such as RLDS when the underlying action and state evidence supports it.
-
-### A useful fit when
-
-- Your VLA or robot-learning team needs manipulation demonstrations beyond a generic open dataset.
-- Your deployment team needs data from the target task, environment, objects, or sensor setup.
-- You have recordings, but quality, lineage, annotation, or conversion blocks confident use.
-- Your benchmark or evaluation needs independent real-world ground truth.
-
-### Delivery can include
-
-- Immutable source recordings in MCAP, rosbag2, or an agreed source format.
-- Normalized episodes, stream manifests, quality reports, and source-linked annotations.
-- Observation or pre-training datasets when robot action and state evidence is absent.
-- RLDS or another consumer-specific projection when the schema and eligibility contract are defined.
+Sync offset, frame rate, stream coverage, and dropped samples are logged alongside the data — every episode ships with the evidence that it's clean.
 
 ## How we work
 
-From real-world capture to verified delivery.
+From real-world tasks to training-ready data.
 
-We preserve an evidence chain across each episode: what was recorded, how streams were aligned, which checks ran, what was derived, who reviewed it, and what a recipient is approved to use.
+We capture how physical tasks are executed in the real world through our own vision, depth, force, and touch sensor devices — then we structure and package it into clean, standardised datasets, delivered ready to train on.
 
-One engine, three accountable stages: Capture → Validate → Deliver.
+One engine, three stages: Capture → Structure → Deliver.
 
 ## The capture tool
 
-Operate the full data loop from one place.
-
-First Motive.app is our operator cockpit for capture, processing, annotation, and review. It keeps each visible result connected to its source recordings and generated evidence instead of hiding the data path behind a dashboard.
-
-## Common questions
-
-What to know before you collect more data.
-
-The useful unit is not a pile of video. It is an episode whose signals, transformations, quality, rights, and intended use remain understandable from capture to delivery.
-
-### What does First Motive provide?
-
-First Motive designs task-specific robotics data engagements. Work can include capture-system design, real-world human demonstration or robot-episode collection, multimodal synchronization, dataset processing, quality validation, annotation, review, and recipient-specific delivery.
-
-### Who is this for?
-
-We work with robotics, VLA, imitation-learning, manipulation, and Physical AI teams that need data tied to a specific task or deployment. The engagement starts from the downstream model, benchmark, evaluation, or product decision rather than a generic promise of more data.
-
-### Can human demonstration data be used to train a robot policy?
-
-Not by default. Egocentric demonstrations can support observation learning, pre-training, annotation, or task understanding. Policy training also needs a valid contract for robot action and state, coordinate frames, units, timing, and calibration. We keep those eligibility decisions explicit.
-
-### What makes a robotics dataset training-ready?
-
-We do not use “training-ready” as a blanket label. Readiness depends on the robot, task, model, schema, and intended use. A useful delivery states what was captured, what is missing, which quality checks ran, which transformations were applied, and which uses the evidence supports or blocks.
-
-### Which robotics data formats can you deliver?
-
-Source delivery can retain MCAP or rosbag2 recordings and adjacent capture metadata. Processed delivery can include normalized episode manifests, quality reports, annotations, and consumer-specific formats such as RLDS when the source data has the action, state, timing, and calibration evidence that format requires.
-
-### How do you handle data rights, consent, and privacy?
-
-Permitted use, participant consent, privacy class, retention, recipient, and redistribution boundaries should be defined at intake and carried into delivery. Technical quality checks do not replace customer, legal, or product approval.
-
-## Start a data brief
-
-Send us the task, environment, robot or model, signals you need, intended use, and timeline. We will tell you whether a focused data pilot is a good fit.
-
-Email adii@firstmotive.ai with the task, environment, robot or model, required signals, intended use, and timeline.
+Good data starts with the way it's captured. We built the tool to do that in-house: here's a preview of the custom IOS app our operators use to set up robots and record episodes in the field.
 
 ## Cowork — Stellenbosch workspace
 

@@ -1,8 +1,8 @@
-# Multimodal robot data capture — First Motive
+# What we do — First Motive
 
-Custom robot training data for real tasks.
+Every AI breakthrough has been a data story. Physical AI has no data.
 
-Open datasets rarely match a team's task, environment, embodiment, sensor stack, or permitted use. We collect human demonstrations and robot episodes for the use case at hand, then keep the source, quality evidence, and derived data traceable through delivery.
+Robots learn from recordings of real tasks — every reach, grip, and slip. That data doesn't exist yet, so we're creating it by capturing real-world tasks and structuring it into reusable training data.
 
 ## Capture modalities
 
@@ -50,7 +50,7 @@ Sensors: Glove Tactile · Sample rate: 40 Hz
 
 **We record the recording.**
 
-Stream coverage, frame rate, sync evidence, and dropped samples are recorded alongside each episode, so quality problems can be found, explained, and dispositioned.
+Sync offset, frame rate, stream coverage, and dropped samples are logged alongside the data — every episode ships with the evidence that it's clean.
 
 ---
 

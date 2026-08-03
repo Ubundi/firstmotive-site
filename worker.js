@@ -15,7 +15,6 @@ function isInternalDeckPath(pathname) {
 const AGENT_DOC_PATHS = new Set([
   '/llms.txt',
   '/index.md',
-  '/robot-training-data.md',
   '/what-we-do.md',
   '/how-we-work.md',
   '/cowork.md',
