@@ -1,2 +1,4 @@
 tweaks.md
 downloads/
+node_modules/
+.wrangler/
