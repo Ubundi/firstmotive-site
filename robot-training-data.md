@@ -1,72 +1,10 @@
-# First Motive — Real-world training data for robots that manipulate.
+# Custom robot training data and multimodal capture
 
 > We design and run task-specific data collection for robotics and Physical AI teams: egocentric vision, depth, motion, and tactile signals, synchronized and packaged with the evidence needed to use them responsibly.
 
-| Fact | Value |
-| --- | --- |
-| Company | First Motive |
-| What | Real-world training data for robots that manipulate. |
-| Engagement | Custom data pilots |
-| Based | Stellenbosch, ZA |
-| Data format | Multi-modal robot training data |
-| Contact | adii@firstmotive.ai |
-| Site | https://firstmotive.ai |
+First Motive designs task-specific data engagements for robotics, VLA, imitation-learning, manipulation, and Physical AI teams. We start from the model, benchmark, evaluation, or deployment decision the data must support.
 
-## What we do
-
-Custom robot training data for real tasks.
-
-Open datasets rarely match a team's task, environment, embodiment, sensor stack, or permitted use. We collect human demonstrations and robot episodes for the use case at hand, then keep the source, quality evidence, and derived data traceable through delivery.
-
-### Capture modalities
-
-| # | Modality | Sensors | Sample rate | What it records |
-| --- | --- | --- | --- | --- |
-| 01 | Vision capture | Head RGB, Wrist L, Wrist R | 30 Hz | What the eyes see. What the hands see. |
-| 02 | Depth & space capture | Head Depth, Chest LiDAR | — | Not pixels. Geometry. |
-| 03 | Motion capture | IMU Hand Track | 200 Hz | The trajectory between reach and grasp. |
-| 04 | Touch & force capture | Glove Tactile | 40 Hz | The part video cannot record. |
-| 05 | Capture integrity | — | — | We record the recording. |
-
-### 01 · Vision capture
-
-**What the eyes see. What the hands see.**
-
-Egocentric head RGB and left and right wrist cameras record the same moment from the operator's viewpoint and from the point of contact.
-
-Sensors: Head RGB, Wrist L, Wrist R · Sample rate: 30 Hz
-
-### 02 · Depth & space capture
-
-**Not pixels. Geometry.**
-
-Aligned depth maps and chest-mounted LiDAR rebuild the environment as three-dimensional structure — shelf height, reach distance, free space, occlusion.
-
-Sensors: Head Depth, Chest LiDAR
-
-### 03 · Motion capture
-
-**The trajectory between reach and grasp.**
-
-High-rate IMU and hand tracking record acceleration, orientation, and articulation — how a body actually moves through a task, not just where it started and stopped.
-
-Sensors: IMU Hand Track · Sample rate: 200 Hz
-
-### 04 · Touch & force capture
-
-**The part video cannot record.**
-
-Per-finger pressure sensing across the fingertips captures grip, slip, and load — how hard is hard enough to lift a loaf of bread without crushing it.
-
-Sensors: Glove Tactile · Sample rate: 40 Hz
-
-### 05 · Capture integrity
-
-**We record the recording.**
-
-Stream coverage, frame rate, sync evidence, and dropped samples are recorded alongside each episode, so quality problems can be found, explained, and dispositioned.
-
-## Robot data services
+## Services
 
 From a data brief to an inspectable dataset.
 
@@ -84,6 +22,8 @@ Raw source stays identifiable while streams are inventoried, aligned, and normal
 
 Annotations and review decisions stay linked to exact source inputs. Delivery packages can include provenance, rights and use metadata, verification steps, and a consumer-specific projection such as RLDS when the underlying action and state evidence supports it.
 
+## Fit and delivery
+
 ### A useful fit when
 
 - Your VLA or robot-learning team needs manipulation demonstrations beyond a generic open dataset.
@@ -98,25 +38,23 @@ Annotations and review decisions stay linked to exact source inputs. Delivery pa
 - Observation or pre-training datasets when robot action and state evidence is absent.
 - RLDS or another consumer-specific projection when the schema and eligibility contract are defined.
 
-## How we work
+## Capture modalities
 
-From real-world capture to verified delivery.
+| # | Modality | Sensors | Sample rate | What it records |
+| --- | --- | --- | --- | --- |
+| 01 | Vision capture | Head RGB, Wrist L, Wrist R | 30 Hz | What the eyes see. What the hands see. |
+| 02 | Depth & space capture | Head Depth, Chest LiDAR | — | Not pixels. Geometry. |
+| 03 | Motion capture | IMU Hand Track | 200 Hz | The trajectory between reach and grasp. |
+| 04 | Touch & force capture | Glove Tactile | 40 Hz | The part video cannot record. |
+| 05 | Capture integrity | — | — | We record the recording. |
 
-We preserve an evidence chain across each episode: what was recorded, how streams were aligned, which checks ran, what was derived, who reviewed it, and what a recipient is approved to use.
+## Data pipeline
 
 One engine, three accountable stages: Capture → Validate → Deliver.
 
-## The capture tool
-
-Operate the full data loop from one place.
-
-First Motive.app is our operator cockpit for capture, processing, annotation, and review. It keeps each visible result connected to its source recordings and generated evidence instead of hiding the data path behind a dashboard.
+We preserve an evidence chain across each episode: what was recorded, how streams were aligned, which checks ran, what was derived, who reviewed it, and what a recipient is approved to use.
 
 ## Common questions
-
-What to know before you collect more data.
-
-The useful unit is not a pile of video. It is an episode whose signals, transformations, quality, rights, and intended use remain understandable from capture to delivery.
 
 ### What does First Motive provide?
 
@@ -147,25 +85,6 @@ Permitted use, participant consent, privacy class, retention, recipient, and red
 Send us the task, environment, robot or model, signals you need, intended use, and timeline. We will tell you whether a focused data pilot is a good fit.
 
 Email adii@firstmotive.ai with the task, environment, robot or model, required signals, intended use, and timeline.
-
-## Cowork — Stellenbosch workspace
-
-Pull up a chair and come work next to us.
-
-Curated, accessible, and with a peek behind the scenes where we build the data engine for physical intelligence — a small workspace in Stellenbosch, opening 2026.
-
-- **Who is in the room:** People building or adjacent to South Africa's global place in AI. AI & ML, Creative & design, Tech & engineering, Research, the genuinely curious.
-- **How you get in:** Open to everyone — students, founders, freelancers; all ages, all budgets. The one thing we look for is that you're genuinely into this AI world. Request an invite, tell us what you're into, and you're in.
-- **Status:** It's not open yet — we're shaping it now. Tell us what you'd want from a space like this, and get first dibs on a founding spot.
-
-## Contact
-
-- Email: adii@firstmotive.ai
-- Site: https://firstmotive.ai
-- Operations: Stellenbosch · ZA
-- From the team behind WooCommerce, applying open-infrastructure thinking to the data layer of Physical AI.
-
-© 2026 First Motive
 
 ---
 

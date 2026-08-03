@@ -1,12 +1,17 @@
 # First Motive
 
-> The data engine that turns off-the-shelf robots into deployment-grade workers. Anyone can inspect our data and measure their own robot against the same benchmark. Built from South Africa.
+> We design and run task-specific data collection for robotics and Physical AI teams: egocentric vision, depth, motion, and tactile signals, synchronized and packaged with the evidence needed to use them responsibly.
 
-First Motive captures real-world task data — vision, depth, motion, touch, and force — and delivers it as verified, multi-modal, RLDS-compatible training data for robots. From the team behind WooCommerce, applying open-infrastructure thinking to the data layer of Physical AI. Status: First pilot project in flight. Based: Stellenbosch, ZA. Contact: adii@firstmotive.ai.
+First Motive designs task-specific robotics data engagements: multimodal capture, dataset processing, quality validation, annotation, review, and recipient-specific delivery. We work from the downstream model, evaluation, or deployment decision so each dataset has an explicit use and evidence boundary. Engagement: Custom data pilots. Based: Stellenbosch, ZA. Contact: adii@firstmotive.ai.
 
-## Pages
+## Core pages
 
-- [First Motive — full site](https://firstmotive.ai/index.md): all key facts in one pass — company facts, capture modalities and specs, pipeline, capture tool, cowork, contact
-- [What we do](https://firstmotive.ai/what-we-do.md): the 5 capture modalities with sensors, sample rates, and purpose
-- [How we work](https://firstmotive.ai/how-we-work.md): the Capture → Structure → Deliver pipeline and the in-house capture app
-- [Cowork](https://firstmotive.ai/cowork.md): the Stellenbosch workspace — who is in the room and how to get in
+- [First Motive website](https://firstmotive.ai/): visual overview and primary contact page
+- [First Motive overview](https://firstmotive.ai/index.md): offer, services, capture modalities, pipeline, FAQ, and contact
+- [Robot training data services](https://firstmotive.ai/robot-training-data.md): buyer fit, engagement scope, delivery artifacts, formats, and common questions
+- [Multimodal data capture](https://firstmotive.ai/what-we-do.md): the 5 capture modalities, sensors, sample rates, and integrity evidence
+- [Data pipeline and delivery](https://firstmotive.ai/how-we-work.md): the Capture → Validate → Deliver pipeline, evidence chain, and operator app
+
+## Other
+
+- [Stellenbosch cowork](https://firstmotive.ai/cowork.md): the local AI workspace, who it is for, and how to request an invite

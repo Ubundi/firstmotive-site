@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /internal-decks/
+
+Sitemap: https://firstmotive.ai/sitemap.xml

@@ -111,7 +111,7 @@ function parseSite(html) {
         .map((match) => [htmlToText(match[1]), htmlToText(match[2])]),
     ),
   };
-  if (!hero.meta.Status || !hero.meta.Based) fail('hero meta strip');
+  if (!hero.meta.Engagement || !hero.meta.Based) fail('hero meta strip');
 
   const whatWeDo = sliceBetween(html, '<section class="statement" id="what-we-do">', '<section class="how"', 'what-we-do section');
   const modalities = [...whatWeDo.matchAll(/<article class="mod-card"[\s\S]*?<\/article>/g)].map((match) => {
@@ -134,6 +134,27 @@ function parseSite(html) {
     modalities,
   };
 
+  const servicesSection = sliceBetween(
+    html,
+    '<section class="services" id="robot-data-services">',
+    '<section class="how"',
+    'robot-data-services section',
+  );
+  const services = {
+    heading: extract(servicesSection, /<h2 class="reveal">([\s\S]*?)<\/h2>/, 'services heading'),
+    lead: extract(servicesSection, /<p class="services-lead reveal">([\s\S]*?)<\/p>/, 'services lead'),
+    cards: [...servicesSection.matchAll(/<article class="service-card reveal">([\s\S]*?)<\/article>/g)].map((match) => ({
+      title: extract(match[1], /<h3>([\s\S]*?)<\/h3>/, 'service title'),
+      body: extract(match[1], /<p>([\s\S]*?)<\/p>/, 'service body'),
+    })),
+    fitGroups: [...servicesSection.matchAll(/<div class="reveal">[\s\S]*?<h3>([\s\S]*?)<\/h3>[\s\S]*?<ul>([\s\S]*?)<\/ul>[\s\S]*?<\/div>/g)]
+      .map((match) => ({
+        title: htmlToText(match[1]),
+        items: extractAll(match[2], /<li>([\s\S]*?)<\/li>/g, 'service fit items'),
+      })),
+  };
+  if (services.cards.length !== 3 || services.fitGroups.length !== 2) fail('service cards and fit groups');
+
   const howSection = sliceBetween(html, '<section class="how" id="how-we-work">', '<section class="hood"', 'how-we-work section');
   const how = {
     heading: extract(howSection, /<h2 class="reveal">([\s\S]*?)<\/h2>/, 'how-we-work heading'),
@@ -142,11 +163,28 @@ function parseSite(html) {
     steps: extractAll(howSection, /<div class="how-step reveal">[\s\S]*?<span>([\s\S]*?)<\/span>/g, 'pipeline steps'),
   };
 
-  const hoodSection = sliceBetween(html, '<section class="hood" id="under-the-hood">', '<section class="cowork"', 'under-the-hood section');
+  const hoodSection = sliceBetween(html, '<section class="hood" id="under-the-hood">', '<section class="questions"', 'under-the-hood section');
   const hood = {
     heading: extract(hoodSection, /<h2 class="reveal">([\s\S]*?)<\/h2>/, 'under-the-hood heading'),
     lead: extract(hoodSection, /<p class="hood-lead reveal">([\s\S]*?)<\/p>/, 'under-the-hood lead'),
   };
+
+  const questionsSection = sliceBetween(
+    html,
+    '<section class="questions" id="questions">',
+    '<section class="cowork"',
+    'questions section',
+  );
+  const questions = {
+    heading: extract(questionsSection, /<h2 class="reveal">([\s\S]*?)<\/h2>/, 'questions heading'),
+    lead: extract(questionsSection, /<p class="questions-lead reveal">([\s\S]*?)<\/p>/, 'questions lead'),
+    items: [...questionsSection.matchAll(/<details class="reveal">([\s\S]*?)<\/details>/g)].map((match) => ({
+      question: extract(match[1], /<summary>([\s\S]*?)<\/summary>/, 'FAQ question'),
+      answer: extract(match[1], /<p>([\s\S]*?)<\/p>/, 'FAQ answer'),
+    })),
+    cta: extract(questionsSection, /<div class="questions-cta reveal">[\s\S]*?<p>([\s\S]*?)<\/p>/, 'questions CTA'),
+  };
+  if (questions.items.length < 4) fail('FAQ items');
 
   const coworkSection = sliceBetween(html, '<section class="cowork" id="work">', '<footer>', 'cowork section');
   const cowork = {
@@ -178,7 +216,7 @@ function parseSite(html) {
     ),
   };
 
-  return { hero, what, how, hood, cowork, foot };
+  return { hero, what, services, how, hood, questions, cowork, foot };
 }
 
 /* ----------------------------------------------------------------------- */
@@ -219,19 +257,42 @@ function pipelineLine({ how }) {
   return `${how.stages.replace(/\.$/, '')}: ${how.steps.join(' → ')}.`;
 }
 
+function serviceDetails({ services }) {
+  return services.cards
+    .map((service, index) => `### ${index + 1}. ${service.title}\n\n${service.body}`)
+    .join('\n\n');
+}
+
+function fitGroups({ services }) {
+  return services.fitGroups
+    .map((group) => `### ${group.title}\n\n${group.items.map((item) => `- ${item}`).join('\n')}`)
+    .join('\n\n');
+}
+
+function faqDetails({ questions }) {
+  return questions.items
+    .map((item) => `### ${item.question}\n\n${item.answer}`)
+    .join('\n\n');
+}
+
 function renderLlmsTxt(site) {
   return `# First Motive
 
 > ${site.hero.sub}
 
-First Motive captures real-world task data — vision, depth, motion, touch, and force — and delivers it as verified, multi-modal, RLDS-compatible training data for robots. ${site.foot.bottom[1]} Status: ${site.hero.meta.Status}. Based: ${site.hero.meta.Based}. Contact: ${site.foot.email}.
+First Motive designs task-specific robotics data engagements: multimodal capture, dataset processing, quality validation, annotation, review, and recipient-specific delivery. We work from the downstream model, evaluation, or deployment decision so each dataset has an explicit use and evidence boundary. Engagement: ${site.hero.meta.Engagement}. Based: ${site.hero.meta.Based}. Contact: ${site.foot.email}.
 
-## Pages
+## Core pages
 
-- [First Motive — full site](${site.foot.siteUrl}/index.md): all key facts in one pass — company facts, capture modalities and specs, pipeline, capture tool, cowork, contact
-- [What we do](${site.foot.siteUrl}/what-we-do.md): the ${site.what.modalities.length} capture modalities with sensors, sample rates, and purpose
-- [How we work](${site.foot.siteUrl}/how-we-work.md): the ${site.how.steps.join(' → ')} pipeline and the in-house capture app
-- [Cowork](${site.foot.siteUrl}/cowork.md): the Stellenbosch workspace — who is in the room and how to get in
+- [First Motive website](${site.foot.siteUrl}/): visual overview and primary contact page
+- [First Motive overview](${site.foot.siteUrl}/index.md): offer, services, capture modalities, pipeline, FAQ, and contact
+- [Robot training data services](${site.foot.siteUrl}/robot-training-data.md): buyer fit, engagement scope, delivery artifacts, formats, and common questions
+- [Multimodal data capture](${site.foot.siteUrl}/what-we-do.md): the ${site.what.modalities.length} capture modalities, sensors, sample rates, and integrity evidence
+- [Data pipeline and delivery](${site.foot.siteUrl}/how-we-work.md): the ${site.how.steps.join(' → ')} pipeline, evidence chain, and operator app
+
+## Other
+
+- [Stellenbosch cowork](${site.foot.siteUrl}/cowork.md): the local AI workspace, who it is for, and how to request an invite
 `;
 }
 
@@ -244,7 +305,7 @@ function renderIndexMd(site) {
 | --- | --- |
 | Company | First Motive |
 | What | ${cell(site.hero.title)} |
-| Status | ${cell(site.hero.meta.Status)} |
+| Engagement | ${cell(site.hero.meta.Engagement)} |
 | Based | ${cell(site.hero.meta.Based)} |
 | Data format | ${cell(site.hero.orbit)} |
 | Contact | ${site.foot.email} |
@@ -262,6 +323,16 @@ ${modalityTable(site)}
 
 ${modalityDetails(site)}
 
+## Robot data services
+
+${site.services.heading}
+
+${site.services.lead}
+
+${serviceDetails(site)}
+
+${fitGroups(site)}
+
 ## How we work
 
 ${site.how.heading}
@@ -272,7 +343,23 @@ ${pipelineLine(site)}
 
 ## The capture tool
 
+${site.hood.heading}
+
 ${site.hood.lead}
+
+## Common questions
+
+${site.questions.heading}
+
+${site.questions.lead}
+
+${faqDetails(site)}
+
+## Start a data brief
+
+${site.questions.cta}
+
+Email ${site.foot.email} with the task, environment, robot or model, required signals, intended use, and timeline.
 
 ## Cowork — Stellenbosch workspace
 
@@ -300,7 +387,7 @@ ${GENERATED_NOTE}
 }
 
 function renderWhatWeDoMd(site) {
-  return `# What we do — First Motive
+  return `# Multimodal robot data capture — First Motive
 
 ${site.what.heading}
 
@@ -318,12 +405,55 @@ ${GENERATED_NOTE}
 `;
 }
 
-function renderHowWeWorkMd(site) {
-  return `# How we work — First Motive
+function renderRobotTrainingDataMd(site) {
+  return `# Custom robot training data and multimodal capture
 
-${site.how.heading}
+> ${site.hero.sub}
+
+First Motive designs task-specific data engagements for robotics, VLA, imitation-learning, manipulation, and Physical AI teams. We start from the model, benchmark, evaluation, or deployment decision the data must support.
+
+## Services
+
+${site.services.heading}
+
+${site.services.lead}
+
+${serviceDetails(site)}
+
+## Fit and delivery
+
+${fitGroups(site)}
+
+## Capture modalities
+
+${modalityTable(site)}
+
+## Data pipeline
+
+${pipelineLine(site)}
 
 ${site.how.lead}
+
+## Common questions
+
+${faqDetails(site)}
+
+## Start a data brief
+
+${site.questions.cta}
+
+Email ${site.foot.email} with the task, environment, robot or model, required signals, intended use, and timeline.
+
+---
+
+${GENERATED_NOTE}
+`;
+}
+
+function renderHowWeWorkMd(site) {
+  return `# Robot data pipeline and delivery — First Motive
+
+${site.how.heading}
 
 ## Pipeline
 
@@ -331,7 +461,11 @@ ${pipelineLine(site)}
 
 ${site.how.steps.map((step, index) => `${index + 1}. **${step}**`).join('\n')}
 
-## The capture tool
+## Evidence chain
+
+${site.how.lead}
+
+## The operator app
 
 ${site.hood.heading}
 
@@ -382,6 +516,7 @@ const site = parseSite(html);
 const outputs = new Map([
   ['llms.txt', renderLlmsTxt(site)],
   ['index.md', renderIndexMd(site)],
+  ['robot-training-data.md', renderRobotTrainingDataMd(site)],
   ['what-we-do.md', renderWhatWeDoMd(site)],
   ['how-we-work.md', renderHowWeWorkMd(site)],
   ['cowork.md', renderCoworkMd(site)],

@@ -1,22 +1,24 @@
-# How we work — First Motive
+# Robot data pipeline and delivery — First Motive
 
-From real-world tasks to training-ready data.
-
-We capture how physical tasks are executed in the real world through our own vision, depth, force, and touch sensor devices — then we structure and package it into clean, standardised datasets, delivered ready to train on.
+From real-world capture to verified delivery.
 
 ## Pipeline
 
-One engine, three stages: Capture → Structure → Deliver.
+One engine, three accountable stages: Capture → Validate → Deliver.
 
 1. **Capture**
-2. **Structure**
+2. **Validate**
 3. **Deliver**
 
-## The capture tool
+## Evidence chain
 
-Check out the tool behind our data.
+We preserve an evidence chain across each episode: what was recorded, how streams were aligned, which checks ran, what was derived, who reviewed it, and what a recipient is approved to use.
 
-Good data starts with the way it's captured. We built the tool to do that in-house: here's a preview of the custom IOS app our operators use to set up robots and record episodes in the field.
+## The operator app
+
+Operate the full data loop from one place.
+
+First Motive.app is our operator cockpit for capture, processing, annotation, and review. It keeps each visible result connected to its source recordings and generated evidence instead of hiding the data path behind a dashboard.
 
 ---
 

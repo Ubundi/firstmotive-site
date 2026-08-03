@@ -2,7 +2,8 @@
   "private": true,
   "scripts": {
     "agent-docs": "node scripts/build-agent-docs.mjs",
-    "agent-docs:check": "node scripts/build-agent-docs.mjs --check"
+    "agent-docs:check": "node scripts/build-agent-docs.mjs --check",
+    "check": "npm run agent-docs:check && node --check worker.js"
   },
   "dependencies": {
     "fflate": "^0.8.2"

@@ -15,6 +15,7 @@ function isInternalDeckPath(pathname) {
 const AGENT_DOC_PATHS = new Set([
   '/llms.txt',
   '/index.md',
+  '/robot-training-data.md',
   '/what-we-do.md',
   '/how-we-work.md',
   '/cowork.md',
@@ -24,8 +25,15 @@ async function serveAgentDoc(request, env) {
   const assetResponse = await env.ASSETS.fetch(request);
   if (!assetResponse.ok) return assetResponse;
   const response = new Response(assetResponse.body, assetResponse);
-  response.headers.set('Content-Type', 'text/markdown; charset=UTF-8');
+  const pathname = new URL(request.url).pathname;
+  response.headers.set(
+    'Content-Type',
+    pathname.endsWith('.md') ? 'text/markdown; charset=UTF-8' : 'text/plain; charset=UTF-8',
+  );
   response.headers.set('Cache-Control', 'public, max-age=300');
+  response.headers.set('Link', '<https://firstmotive.ai/>; rel="canonical"');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Robots-Tag', 'noindex, follow');
   return response;
 }
 
