@@ -2746,6 +2746,7 @@
 (function () {
   if (!('IntersectionObserver' in window)) {
     if (window.__fmModDeck) window.__fmModDeck.restartFromStart();
+    if (window.__fmObserveViz) window.__fmObserveViz.setActive(true);
     var iframe = document.getElementById('howPipeline');
     if (iframe && iframe.dataset.src) iframe.src = iframe.dataset.src;
     return;
@@ -2800,6 +2801,16 @@
     function () {
       if (!howFrame || reduce) return;
       howFrame.src = 'about:blank';
+    }
+  );
+
+  watchSection(
+    document.getElementById('under-the-hood'),
+    function () {
+      if (window.__fmObserveViz) window.__fmObserveViz.setActive(true);
+    },
+    function () {
+      if (window.__fmObserveViz) window.__fmObserveViz.setActive(false);
     }
   );
 })();

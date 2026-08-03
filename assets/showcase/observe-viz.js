@@ -11,6 +11,13 @@
   var recording = false;
   var recStarted = 0;
   var standbyBase = 12.4;
+  var sectionActive = false;
+  var clockTimer = 0;
+  var rafId = 0;
+  var looping = false;
+  var paintFn = null;
+  var loopStart = 0;
+  var episodeDur = 3.3;
 
   var timerEl = document.getElementById('obsTimer');
   var standbyClock = document.getElementById('obsStandbyClock');
@@ -33,6 +40,7 @@
   }
 
   function tickClocks() {
+    if (!sectionActive) return;
     if (mode === 'standby' && standbyClock) {
       var t = standbyBase + ((Date.now() / 1000) % 47) * 0.02;
       standbyClock.textContent = fmtStandby(t);
@@ -42,8 +50,22 @@
       timerEl.textContent = fmtRec(elapsed);
     }
   }
-  tickClocks();
-  if (!reduce) setInterval(tickClocks, 100);
+
+  function startClocks() {
+    if (reduce || clockTimer) return;
+    clockTimer = setInterval(tickClocks, 100);
+  }
+
+  function stopClocks() {
+    if (!clockTimer) return;
+    clearInterval(clockTimer);
+    clockTimer = 0;
+  }
+
+  function pauseAllMedia() {
+    if (standbyVideo) standbyVideo.pause();
+    root.querySelectorAll('.obs-pane video').forEach(function (v) { v.pause(); });
+  }
 
   function syncToggleInputs() {
     root.querySelectorAll('[data-obs-toggle]').forEach(function (input) {
@@ -81,8 +103,13 @@
   }
 
   function syncMedia() {
+    if (!sectionActive || reduce) {
+      pauseAllMedia();
+      return;
+    }
+
     if (standbyVideo) {
-      if (mode === 'standby' && !reduce) playEl(standbyVideo);
+      if (mode === 'standby') playEl(standbyVideo);
       else standbyVideo.pause();
     }
 
@@ -93,6 +120,60 @@
       else v.pause();
     });
   }
+
+  function stopLoop() {
+    looping = false;
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = 0;
+    }
+  }
+
+  function startLoop() {
+    if (reduce || !sectionActive || !paintFn || looping) return;
+    looping = true;
+    loopStart = performance.now();
+    var last = 0;
+    (function loop(now) {
+      if (!sectionActive) {
+        looping = false;
+        rafId = 0;
+        return;
+      }
+      var t = ((now - loopStart) / 1000) % episodeDur;
+      if (now - last > 40) {
+        last = now;
+        paintFn(t);
+      }
+      rafId = requestAnimationFrame(loop);
+    })(loopStart);
+  }
+
+  function setSectionActive(on) {
+    sectionActive = !!on;
+    if (sectionActive) {
+      if (mode === 'observe') {
+        recording = true;
+        recStarted = Date.now();
+        root.querySelectorAll('.obs-pane video').forEach(function (v) {
+          try { v.currentTime = 0; } catch (e) {}
+        });
+      }
+      syncMedia();
+      tickClocks();
+      startClocks();
+      if (reduce && paintFn) paintFn(episodeDur * 0.4);
+      else startLoop();
+    } else {
+      pauseAllMedia();
+      stopClocks();
+      stopLoop();
+    }
+  }
+
+  window.__fmObserveViz = {
+    setActive: setSectionActive
+  };
 
   function setMode(next) {
     if (next !== 'standby' && next !== 'observe') return;
@@ -515,16 +596,17 @@
     var headLive = root.querySelector('.obs-pane--head .obs-pane-live');
     if (headLive) headLive.textContent = Math.round(headFps) + ' Hz · Live';
 
+    episodeDur = DUR;
+
     root.querySelectorAll('video').forEach(function (v) {
       v.muted = true;
       v.playsInline = true;
       v.loop = true;
     });
-    syncMedia();
 
     var lastT = 0;
-    function paint(t) {
-      if (mode !== 'observe' || !state.signals) return;
+    paintFn = function paint(t) {
+      if (!sectionActive || mode !== 'observe' || !state.signals) return;
       var dt = Math.max(0.016, Math.min(0.1, t - lastT || 0.04));
       if (t < lastT) dt = 0.04;
       lastT = t;
@@ -533,26 +615,18 @@
       drawFps(wrCanvas, wrVal, wrFps, t, '#c9a87a');
       drawTactile(tactCanvas, EP, t, FULL);
       drawGlove(t, dt);
-    }
+    };
 
-    if (reduce) {
-      paint(DUR * 0.4);
-      return;
-    }
-
-    var start = performance.now();
-    var last = 0;
-    (function loop(now) {
-      var t = ((now - start) / 1000) % DUR;
-      if (now - last > 40) {
-        last = now;
-        paint(t);
-      }
-      requestAnimationFrame(loop);
-    })(start);
+    /* Stay idle until #under-the-hood scrolls into view. */
+    syncMedia();
+    if (sectionActive) setSectionActive(true);
 
     window.addEventListener('resize', function () {
-      paint(((performance.now() - start) / 1000) % DUR);
+      if (!sectionActive || !paintFn) return;
+      var t = loopStart
+        ? ((performance.now() - loopStart) / 1000) % episodeDur
+        : episodeDur * 0.4;
+      paintFn(t);
     });
   }
 })();
