@@ -787,9 +787,9 @@
     aspect-ratio: 16 / 10;
     border-radius: 6px;
     overflow: hidden;
-    background: #231B28;
+    background: transparent;
     border: none;
-    box-shadow: 0 24px 60px -36px rgba(0, 0, 0, 0.55);
+    box-shadow: none;
   }
   .how-media iframe {
     position: absolute;
@@ -798,7 +798,8 @@
     height: 100%;
     border: 0;
     display: block;
-    background: #231B28;
+    background: transparent;
+    color-scheme: normal;
   }
   .how-copy {
     max-width: 520px;
@@ -1783,7 +1784,7 @@
     <div class="how-media reveal-fade">
       <iframe
         id="howPipeline"
-        data-src="assets/robot-capture-pipeline.html?v=4"
+        data-src="assets/robot-capture-pipeline.html?v=5"
         src="about:blank"
         title="Robot capture pipeline animation"
         allow="autoplay"
