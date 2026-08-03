@@ -1,0 +1,12 @@
+# First Motive
+
+> The data engine that turns off-the-shelf robots into deployment-grade workers. Anyone can inspect our data and measure their own robot against the same benchmark. Built from South Africa.
+
+First Motive captures real-world task data — vision, depth, motion, touch, and force — and delivers it as verified, multi-modal, RLDS-compatible training data for robots. From the team behind WooCommerce, applying open-infrastructure thinking to the data layer of Physical AI. Status: First pilot project in flight. Based: Stellenbosch, ZA. Contact: adii@firstmotive.ai.
+
+## Pages
+
+- [First Motive — full site](https://firstmotive.ai/index.md): all key facts in one pass — company facts, capture modalities and specs, pipeline, capture tool, cowork, contact
+- [What we do](https://firstmotive.ai/what-we-do.md): the 5 capture modalities with sensors, sample rates, and purpose
+- [How we work](https://firstmotive.ai/how-we-work.md): the Capture → Structure → Deliver pipeline and the in-house capture app
+- [Cowork](https://firstmotive.ai/cowork.md): the Stellenbosch workspace — who is in the room and how to get in

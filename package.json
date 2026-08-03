@@ -1,5 +1,9 @@
 {
   "private": true,
+  "scripts": {
+    "agent-docs": "node scripts/build-agent-docs.mjs",
+    "agent-docs:check": "node scripts/build-agent-docs.mjs --check"
+  },
   "dependencies": {
     "fflate": "^0.8.2"
   }

@@ -10,6 +10,25 @@ function isInternalDeckPath(pathname) {
   return pathname === '/internal-decks' || pathname.startsWith('/internal-decks/');
 }
 
+/* Agent-readable docs: llms.txt + Markdown mirrors of the page sections.
+   Generated from index.html by scripts/build-agent-docs.mjs. */
+const AGENT_DOC_PATHS = new Set([
+  '/llms.txt',
+  '/index.md',
+  '/what-we-do.md',
+  '/how-we-work.md',
+  '/cowork.md',
+]);
+
+async function serveAgentDoc(request, env) {
+  const assetResponse = await env.ASSETS.fetch(request);
+  if (!assetResponse.ok) return assetResponse;
+  const response = new Response(assetResponse.body, assetResponse);
+  response.headers.set('Content-Type', 'text/markdown; charset=UTF-8');
+  response.headers.set('Cache-Control', 'public, max-age=300');
+  return response;
+}
+
 function fixedTimeEqual(left, right) {
   if (left.length !== right.length) return false;
   let difference = 0;
@@ -323,6 +342,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (AGENT_DOC_PATHS.has(url.pathname)) return serveAgentDoc(request, env);
     if (!isInternalDeckPath(url.pathname)) return env.ASSETS.fetch(request);
     if (!hasValidPassword(request, env.INTERNAL_DECKS_PASSWORD ?? '')) return authRequired();
 
