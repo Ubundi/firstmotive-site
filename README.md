@@ -34,4 +34,4 @@ Never edit the generated files by hand. Run the check before deploying.
 
 ## Contact
 
-[adii@ubundi.com](mailto:adii@ubundi.com) · [firstmotive.ai](https://firstmotive.ai)
+[adii@firstmotive.ai](mailto:adii@firstmotive.ai) · [firstmotive.ai](https://firstmotive.ai)

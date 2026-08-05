@@ -224,7 +224,9 @@ function renderLlmsTxt(site) {
 
 > ${site.hero.sub}
 
-First Motive captures real-world task data — vision, depth, motion, touch, and force — and delivers it as verified, multi-modal, RLDS-compatible training data for robots. ${site.foot.bottom[1]} Status: ${site.hero.meta.Status}. Based: ${site.hero.meta.Based}. Contact: ${site.foot.email}.
+${site.what.follow}
+
+Capture modalities: ${site.what.modalities.map((modality) => modality.title).join(', ')}. Data format: ${site.hero.orbit}. ${site.foot.bottom[1]} Status: ${site.hero.meta.Status}. Based: ${site.hero.meta.Based}. Contact: ${site.foot.email}.
 
 ## Pages
 
